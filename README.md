@@ -3,7 +3,7 @@
 
 # cwd-comments
 
-Cloudflare Worker 版本基于 Cloudflare Workers + D1 + KV 实现，无需服务器即可部署运行。
+Cloudflare Worker 版本基于 Cloudflare Workers + D1 + KV 实现，无需服务器即可部署运行的评论组件。
 
 > 基于 https://github.com/Motues/Momo-Backend 进行二次开发的 Cloudflare Worker 版本，做了大量扩展更新。
 
