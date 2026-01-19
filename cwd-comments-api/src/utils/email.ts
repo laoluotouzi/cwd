@@ -1,38 +1,6 @@
 import { Bindings } from '../bindings';
 
 /**
- * 通用 Resend API 请求函数
- */
-async function resendFetch(env: Bindings, body: object) {
-  const response = await fetch('https://api.resend.com/emails', {
-    method: 'POST',
-    headers: {
-      'Authorization': `Bearer ${env.RESEND_API_KEY}`,
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify(body),
-  });
-
-  if (!response.ok) {
-    const errorData = await response.json().catch(() => ({}));
-    const status = response.status;
-    
-    // 对应你提供的状态码逻辑
-    const errorMap: Record<number, string> = {
-      400: '参数错误，请检查格式',
-      401: 'API Key 缺失',
-      403: 'API Key 无效',
-      429: '发送频率过快',
-    };
-
-    const msg = errorMap[status] || `Resend 服务器错误 (${status})`;
-    throw new Error(`${msg}: ${JSON.stringify(errorData)}`);
-  }
-
-  return await response.json();
-}
-
-/**
  * 回复通知邮件
  */
 export async function sendCommentReplyNotification(
@@ -49,11 +17,7 @@ export async function sendCommentReplyNotification(
 ) {
   const { toEmail, toName, postTitle, parentComment, replyAuthor, replyContent, postUrl } = params;
 
-  return await resendFetch(env, {
-    from: `评论通知 ${env.RESEND_FROM_EMAIL}`,
-    to: [toEmail],
-    subject: `你在 example.com 上的评论有了新回复`,
-    html: `
+  const html = `
       <div style="font-family: sans-serif; line-height: 1.6; color: #333;">
         <p>Hi <b>${toName}</b>，</p>
         <p>${replyAuthor} 回复了你在 <b>${postTitle}</b> 中的评论：</p>
@@ -72,7 +36,17 @@ export async function sendCommentReplyNotification(
         <hr style="border: none; border-top: 1px solid #eee; margin-top: 30px;">
         <p style="font-size: 12px; color: #999;">此邮件由系统自动发送，请勿直接回复。</p>
       </div>
-    `
+    `;
+
+  if (!env.SEND_EMAIL || !env.CF_FROM_EMAIL) {
+    throw new Error('未配置邮件发送绑定或发件人地址');
+  }
+
+  await env.SEND_EMAIL.send({
+    to: [{ email: toEmail }],
+    from: { email: env.CF_FROM_EMAIL },
+    subject: `你在 example.com 上的评论有了新回复`,
+    html
   });
 }
 
@@ -88,20 +62,37 @@ export async function sendCommentNotification(
     commentContent: string;
   }
 ) {
-const { postTitle, postUrl, commentAuthor, commentContent } = params;
+  const { postTitle, postUrl, commentAuthor, commentContent } = params;
+  const toEmail = await getAdminNotifyEmail(env);
 
-  return await resendFetch(env, {
-    from: `评论提醒 ${env.RESEND_FROM_EMAIL}`,
-    to: [env.EMAIL_ADDRESS],
-    subject: `新评论通知：${postTitle}`,
-    html: `
-      <div style="font-family: sans-serif;">
-        <p><b>${commentAuthor}</b> 在文章《${postTitle}》下发表了评论：</p>
-        <div style="padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
-          ${commentContent}
-        </div>
-        <p><a href="${postUrl}">点击跳转到文章</a></p>
+  const html = `
+    <div style="font-family: sans-serif;">
+      <p><b>${commentAuthor}</b> 在文章《${postTitle}》下发表了评论：</p>
+      <div style="padding: 15px; border: 1px solid #ddd; border-radius: 8px;">
+        ${commentContent}
       </div>
-    `
+      <p><a href="${postUrl}">点击跳转到文章</a></p>
+    </div>
+  `;
+
+  if (!env.SEND_EMAIL || !env.CF_FROM_EMAIL) {
+    throw new Error('未配置邮件发送绑定或发件人地址');
+  }
+
+  await env.SEND_EMAIL.send({
+    to: [{ email: toEmail }],
+    from: { email: env.CF_FROM_EMAIL },
+    subject: `新评论通知：${postTitle}`,
+    html
   });
+}
+
+// 读取管理员通知邮箱：优先 KV 设置，其次环境变量
+async function getAdminNotifyEmail(env: Bindings): Promise<string> {
+  if (env.CWD_CONFIG_KV) {
+    const val = await env.CWD_CONFIG_KV.get('settings:admin_notify_email');
+    if (val) return val;
+  }
+  if (env.EMAIL_ADDRESS) return env.EMAIL_ADDRESS;
+  throw new Error('未配置管理员通知邮箱');
 }

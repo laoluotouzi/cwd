@@ -1,6 +1,5 @@
 ALLOW_ORIGIN="http://localhost:4321,https://blog.example.top"
-RESEND_API_KEY="re_xxxxxxxx"
-RESEND_FROM_EMAIL="<notify@notifications.example.top>"
+CF_FROM_EMAIL="noreply@yourdomain.com"
 EMAIL_ADDRESS="admin@example.top"
 ADMIN_NAME="Admin"
 ADMIN_PASSWORD="password"

@@ -8,6 +8,12 @@
 
 ## 部署
 
+**以下部署指令均在该目录下执行，不在根目录下**
+
+```
+cd cwd-comments-api
+```
+
 ### 本地部署
 
 #### 1. 下载代码，安装依赖
@@ -44,15 +50,21 @@ npm install
   ]
   ```
   如果`binding`字段不是`CWD_DB`，请修改为`CWD_DB`
+  
 * **创建 KV 存储**，如果遇到提示，按回车继续
   ```bash
   npx wrangler kv namespace create CWD_AUTH_KV
+  npx wrangler kv namespace create CWD_CONFIG_KV
   ```
   运行完成后可以确认一下 `wrangler.jsonc` 中是否有如下配置
   ```jsonc
   "kv_namespaces": [
       {
           "binding": "CWD_AUTH_KV",
+          "id": "xxxxxxx" // KV 存储 ID
+      },
+      {
+          "binding": "CWD_CONFIG_KV",
           "id": "xxxxxxx" // KV 存储 ID
       }
   ]
@@ -80,16 +92,15 @@ npm install
 
 所需环境变量如下表所示，请参考源码中 `.dev.vars.example` 文件
 
-| 变量名              | 描述                                                                             |
-| ------------------- | -------------------------------------------------------------------------------- |
-| `ALLOW_ORIGIN`      | 允许跨域请求的域名，用逗号分隔                                                   |
-| `RESEND_API_KEY`    | Resend API Key，用于启用邮件通知服务，如**果不需要邮件通知服务，可以不填**       |
-| `RESEND_FROM_EMAIL` | Resend 发送邮件的邮箱，用于邮件通知服务，**如果不需要邮件通知服务，可以不填**    |
-| `EMAIL_ADDRESS`     | 管理员接收通知邮件的邮箱，用于邮件通知服务，**如果不需要邮件通知服务，可以不填** |
-| `ADMIN_NAME`        | 管理员登录名称，默认为 admin                                                     |
-| `ADMIN_PASSWORD`    | 管理员登录密码，默认密码为 password                                              |
+| 变量名               | 描述                                                                                 |
+| -------------------- | ------------------------------------------------------------------------------------ |
+| `ALLOW_ORIGIN`       | 允许跨域请求的域名，用逗号分隔                                                       |
+| `CF_FROM_EMAIL`      | 作为发件人显示的邮箱地址（需在 Cloudflare Email 路由中预先配置）                    |
+| `EMAIL_ADDRESS`      | 管理员接收通知邮件的默认邮箱（可在后台设置中覆盖）                                  |
+| `ADMIN_NAME`         | 管理员登录名称，默认为 admin                                                         |
+| `ADMIN_PASSWORD`     | 管理员登录密码，默认密码为 password                                                  |
 
-**注:** [Resend 官网](https://resend.com/)
+**注:** 需要在 Cloudflare 控制面板中为 Email 路由开启发送权限并配置发件人域和地址，并在 `wrangler.jsonc` 中为 Worker 添加 `send_email` 绑定，以便在代码中通过 `env.SEND_EMAIL.send()` 直接发信。
 
 
 ## 本地测试

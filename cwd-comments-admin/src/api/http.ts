@@ -1,0 +1,47 @@
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL.replace(/\/+$/, '');
+
+type HttpMethod = 'GET' | 'POST' | 'PUT' | 'DELETE';
+
+async function request<T>(method: HttpMethod, path: string, body?: unknown): Promise<T> {
+	const token = localStorage.getItem('cwd_admin_token');
+	const headers: HeadersInit = {};
+	if (body !== undefined) {
+		headers['Content-Type'] = 'application/json';
+	}
+	if (token) {
+		headers['Authorization'] = `Bearer ${token}`;
+	}
+	const res = await fetch(`${API_BASE_URL}${path}`, {
+		method,
+		headers,
+		body: body !== undefined ? JSON.stringify(body) : undefined
+	});
+	let data: any = null;
+	try {
+		data = await res.json();
+	} catch {
+		data = null;
+	}
+	if (!res.ok) {
+		const message = data && data.message ? data.message : `请求失败，状态码 ${res.status}`;
+		throw new Error(message);
+	}
+	return data as T;
+}
+
+export function get<T>(path: string): Promise<T> {
+	return request<T>('GET', path);
+}
+
+export function post<T>(path: string, body?: unknown): Promise<T> {
+	return request<T>('POST', path, body);
+}
+
+export function put<T>(path: string, body?: unknown): Promise<T> {
+	return request<T>('PUT', path, body);
+}
+
+export function del<T>(path: string): Promise<T> {
+	return request<T>('DELETE', path);
+}
+
