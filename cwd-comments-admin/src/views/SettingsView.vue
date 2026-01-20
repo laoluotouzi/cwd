@@ -40,25 +40,11 @@
       </div>
 
       <div class="card">
-        <h3 class="card-title">通知邮箱设置</h3>
+        <h3 class="card-title">通知邮箱设置（测试中，暂未开放）</h3>
         <div class="form-item">
           <label class="form-label">开启邮件通知</label>
           <label class="switch">
             <input v-model="emailGlobalEnabled" type="checkbox" />
-            <span class="slider" />
-          </label>
-        </div>
-        <div class="form-item">
-          <label class="form-label">新评论通知管理员</label>
-          <label class="switch">
-            <input v-model="emailAdminEnabled" type="checkbox" />
-            <span class="slider" />
-          </label>
-        </div>
-        <div class="form-item">
-          <label class="form-label">评论回复通知用户</label>
-          <label class="switch">
-            <input v-model="emailUserEnabled" type="checkbox" />
             <span class="slider" />
           </label>
         </div>
@@ -96,8 +82,6 @@ import {
 
 const email = ref("");
 const emailGlobalEnabled = ref(true);
-const emailAdminEnabled = ref(true);
-const emailUserEnabled = ref(true);
 const commentAdminEmail = ref("");
 const commentAdminBadge = ref("");
 const avatarPrefix = ref("");
@@ -134,8 +118,6 @@ async function load() {
     avatarPrefix.value = commentRes.avatarPrefix || "";
     commentAdminEnabled.value = !!commentRes.adminEnabled;
     emailGlobalEnabled.value = !!emailNotifyRes.globalEnabled;
-    emailAdminEnabled.value = !!emailNotifyRes.adminEnabled;
-    emailUserEnabled.value = !!emailNotifyRes.userEnabled;
   } catch (e: any) {
     message.value = e.message || "加载失败";
     messageType.value = "error";
@@ -157,8 +139,6 @@ async function saveEmail() {
       saveAdminEmail(email.value),
       saveEmailNotifySettings({
         globalEnabled: emailGlobalEnabled.value,
-        adminEnabled: emailAdminEnabled.value,
-        userEnabled: emailUserEnabled.value,
       }),
     ]);
     showToast(emailRes.message || "保存成功", "success");

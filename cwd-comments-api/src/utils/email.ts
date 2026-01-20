@@ -75,8 +75,8 @@ export async function loadEmailNotificationSettings(
   }
 
   const globalEnabled = parseEnabled(map.get(EMAIL_NOTIFY_GLOBAL_KEY), true);
-  const adminEnabled = parseEnabled(map.get(EMAIL_NOTIFY_ADMIN_KEY), true);
-  const userEnabled = parseEnabled(map.get(EMAIL_NOTIFY_USER_KEY), true);
+  const adminEnabled = globalEnabled;
+  const userEnabled = globalEnabled;
 
   return {
     globalEnabled,
