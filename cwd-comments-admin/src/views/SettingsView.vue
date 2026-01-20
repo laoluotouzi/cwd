@@ -178,7 +178,7 @@
           </button>
           <button
             class="card-button secondary"
-            type="button"
+            style="margin-left: auto;"
             @click="resetTemplatesToDefault"
           >
             恢复默认模板
@@ -625,6 +625,7 @@ onMounted(() => {
 
 .card-actions {
   display: flex;
+  gap: 10px;
   justify-content: flex-end;
 }
 
