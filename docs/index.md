@@ -3,7 +3,7 @@ layout: home
 
 hero:
   name: 'CWD 评论系统'
-  tagline: 轻量级、高性能的评论解决方案, 基于 Cloudflare Workers + D1 + KV 构建
+  tagline: 轻量级、高性能的评论解决方案<br>基于 Cloudflare Workers + D1 + KV 构建
   image:
     src: https://github.com/anghunk/cwd-comments/blob/main/icon.png?raw=true
     alt: 文档封面
