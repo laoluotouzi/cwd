@@ -1,6 +1,6 @@
 <template>
   <div class="page">
-    <h2 class="page-title">系统设置</h2>
+    <h2 class="page-title">网站设置</h2>
     <div
       v-if="toastVisible"
       class="toast"

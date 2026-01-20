@@ -32,17 +32,17 @@
           </li>
           <li
             class="menu-item"
+            :class="{ active: isRouteActive('settings') }"
+            @click="goSettings"
+          >
+            网站设置
+          </li>
+          <li
+            class="menu-item"
             :class="{ active: isRouteActive('data') }"
             @click="goData"
           >
             数据管理
-          </li>
-          <li
-            class="menu-item"
-            :class="{ active: isRouteActive('settings') }"
-            @click="goSettings"
-          >
-            系统设置
           </li>
         </ul>
       </nav>

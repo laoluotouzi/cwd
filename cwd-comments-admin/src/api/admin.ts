@@ -129,3 +129,7 @@ export function exportComments(): Promise<any[]> {
 	return get<any[]>('/admin/comments/export');
 }
 
+export function importComments(data: any[]): Promise<{ message: string }> {
+	return post<{ message: string }>('/admin/comments/import', data);
+}
+

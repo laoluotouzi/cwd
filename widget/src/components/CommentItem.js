@@ -251,11 +251,8 @@ export class CommentItem extends Component {
   }
 
   handleReply() {
-    console.log('[CommentItem] handleReply called, comment.id:', this.props.comment.id);
     if (this.props.onReply) {
       this.props.onReply(this.props.comment.id);
-    } else {
-      console.warn('[CommentItem] onReply callback is missing!');
     }
   }
 

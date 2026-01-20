@@ -41,11 +41,6 @@ export class CommentList extends Component {
 
   render() {
     const { comments, loading, error, currentPage, totalPages } = this.props;
-
-    console.log('[CommentList] render called, comments:', comments);
-    console.log('[CommentList] comments.length:', comments?.length);
-    console.log('[CommentList] loading:', loading);
-
     // 清空容器
     this.empty(this.container);
 
@@ -93,7 +88,6 @@ export class CommentList extends Component {
       this.commentItems.clear();
 
       comments.forEach((comment, index) => {
-        console.log(`[CommentList] Rendering comment ${index}:`, comment);
         const commentItem = new CommentItem(commentsContainer, {
           comment,
           replyingTo: this.props.replyingTo,
@@ -113,8 +107,6 @@ export class CommentList extends Component {
         this.commentItems.set(comment.id, commentItem);
       });
 
-      console.log('[CommentList] Final commentsContainer children count:', commentsContainer.children.length);
-      console.log('[CommentList] Final commentsContainer innerHTML:', commentsContainer.innerHTML);
       root.appendChild(commentsContainer);
     } else {
       // 空状态
