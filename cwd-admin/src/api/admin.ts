@@ -62,6 +62,26 @@ export type EmailNotifySettingsResponse = {
 	};
 };
 
+export type CommentStatsResponse = {
+	summary: {
+		total: number;
+		approved: number;
+		pending: number;
+		rejected: number;
+	};
+	domains: {
+		domain: string;
+		total: number;
+		approved: number;
+		pending: number;
+		rejected: number;
+	}[];
+	last7Days: {
+		date: string;
+		total: number;
+	}[];
+};
+
 export async function loginAdmin(name: string, password: string): Promise<string> {
 	const res = await post<AdminLoginResponse>('/admin/login', { name, password });
 	const key = res.data.key;
@@ -159,4 +179,8 @@ export function exportComments(): Promise<any[]> {
 
 export function importComments(data: any[]): Promise<{ message: string }> {
 	return post<{ message: string }>('/admin/comments/import', data);
+}
+
+export function fetchCommentStats(): Promise<CommentStatsResponse> {
+	return get<CommentStatsResponse>('/admin/stats/comments');
 }

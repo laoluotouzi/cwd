@@ -21,6 +21,7 @@ import { updateStatus } from './api/admin/updateStatus';
 import { getAdminEmail } from './api/admin/getAdminEmail';
 import { setAdminEmail } from './api/admin/setAdminEmail';
 import { testEmail } from './api/admin/testEmail';
+import { getStats } from './api/admin/getStats';
 
 const app = new Hono<{ Bindings: Bindings }>();
 const VERSION = `v${packageJson.version}`;
@@ -236,6 +237,7 @@ app.get('/admin/comments/list', listComments);
 app.get('/admin/comments/export', exportComments);
 app.post('/admin/comments/import', importComments);
 app.put('/admin/comments/status', updateStatus);
+app.get('/admin/stats/comments', getStats);
 app.get('/admin/settings/email', getAdminEmail);
 app.put('/admin/settings/email', setAdminEmail);
 app.get('/admin/settings/email-notify', async (c) => {

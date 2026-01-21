@@ -70,6 +70,13 @@
           </li>
           <li
             class="menu-item"
+            :class="{ active: isRouteActive('stats') }"
+            @click="goStats"
+          >
+            数据看板
+          </li>
+          <li
+            class="menu-item"
             :class="{ active: isRouteActive('settings') }"
             @click="goSettings"
           >
@@ -125,6 +132,11 @@ function closeActions() {
 
 function goComments() {
   router.push({ name: "comments" });
+  closeSider();
+}
+
+function goStats() {
+  router.push({ name: "stats" });
   closeSider();
 }
 

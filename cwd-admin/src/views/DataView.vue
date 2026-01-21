@@ -425,6 +425,72 @@ async function executeImport(comments: any[]) {
   font-size: 15px;
 }
 
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stats-item {
+  padding: 10px 12px;
+  border-radius: 6px;
+  background-color: #f6f8fa;
+  border: 1px solid #d0d7de;
+}
+
+.stats-label {
+  font-size: 12px;
+  color: #57606a;
+  margin-bottom: 4px;
+}
+
+.stats-value {
+  font-size: 18px;
+  font-weight: 600;
+  color: #24292f;
+}
+
+.stats-value-approved {
+  color: #1a7f37;
+}
+
+.stats-value-pending {
+  color: #9a6700;
+}
+
+.stats-value-rejected {
+  color: #d1242f;
+}
+
+.domain-table {
+  border: 1px solid #d0d7de;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.domain-table-header {
+  display: flex;
+  background-color: #f6f8fa;
+}
+
+.domain-table-row {
+  display: flex;
+  border-top: 1px solid #eaeae0;
+}
+
+.domain-cell {
+  flex: 1;
+  padding: 8px 10px;
+  font-size: 13px;
+  color: #24292f;
+  box-sizing: border-box;
+}
+
+.domain-cell-domain {
+  flex: 2;
+  font-weight: 500;
+}
+
 .card-desc {
   font-size: 14px;
   color: #57606a;

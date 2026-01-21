@@ -4,6 +4,7 @@ import LayoutView from '../views/LayoutView.vue';
 import CommentsView from '../views/CommentsView.vue';
 import SettingsView from '../views/SettingsView.vue';
 import DataView from '../views/DataView.vue';
+import StatsView from '../views/StatsView.vue';
 
 const routes: RouteRecordRaw[] = [
 	{
@@ -23,6 +24,11 @@ const routes: RouteRecordRaw[] = [
 				path: 'comments',
 				name: 'comments',
 				component: CommentsView
+			},
+			{
+				path: 'stats',
+				name: 'stats',
+				component: StatsView
 			},
 			{
 				path: 'settings',
@@ -55,4 +61,3 @@ router.beforeEach((to, from, next) => {
 	}
 	next();
 });
-
