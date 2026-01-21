@@ -1,6 +1,18 @@
 <template>
   <div class="page">
-    <h2 class="page-title">数据看板</h2>
+    <div style="display: flex; align-items: center; gap: 20px">
+      <h2 class="page-title">数据看板</h2>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select v-model="domainFilter" class="toolbar-select">
+            <option value="">全部域名</option>
+            <option v-for="item in domainOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
     <div
       v-if="toastVisible"
       class="toast"
@@ -74,7 +86,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, nextTick } from "vue";
+import { onMounted, onBeforeUnmount, ref, nextTick, watch } from "vue";
 import * as echarts from "echarts";
 import { fetchCommentStats } from "../api/admin";
 
@@ -86,6 +98,8 @@ type DomainStat = {
   rejected: number;
 };
 
+const DOMAIN_STORAGE_KEY = "cwd_admin_domain_filter";
+
 const statsLoading = ref(false);
 const statsError = ref("");
 const statsSummary = ref({
@@ -96,6 +110,13 @@ const statsSummary = ref({
 });
 const domainStats = ref<DomainStat[]>([]);
 const last7Days = ref<{ date: string; total: number }[]>([]);
+
+const storedDomain =
+  typeof window !== "undefined"
+    ? window.localStorage.getItem(DOMAIN_STORAGE_KEY) || ""
+    : "";
+const domainFilter = ref(storedDomain);
+const domainOptions = ref<string[]>([]);
 
 const toastMessage = ref("");
 const toastType = ref<"success" | "error">("success");
@@ -117,7 +138,7 @@ async function loadStats() {
   statsLoading.value = true;
   statsError.value = "";
   try {
-    const res = await fetchCommentStats();
+    const res = await fetchCommentStats(domainFilter.value || undefined);
     statsSummary.value = {
       total: res.summary.total,
       approved: res.summary.approved,
@@ -125,6 +146,14 @@ async function loadStats() {
       rejected: res.summary.rejected,
     };
     domainStats.value = res.domains;
+    const domains = Array.isArray(res.domains)
+      ? res.domains.map((item) => item.domain)
+      : [];
+    const set = new Set(domains);
+    if (domainFilter.value && !set.has(domainFilter.value)) {
+      set.add(domainFilter.value);
+    }
+    domainOptions.value = Array.from(set);
     last7Days.value = Array.isArray(res.last7Days) ? res.last7Days : [];
   } catch (e: any) {
     const msg = e.message || "加载统计数据失败";
@@ -207,6 +236,13 @@ onMounted(() => {
   window.addEventListener("resize", handleResize);
 });
 
+watch(domainFilter, (value) => {
+  if (typeof window !== "undefined") {
+    window.localStorage.setItem(DOMAIN_STORAGE_KEY, value || "");
+  }
+  loadStats();
+});
+
 onBeforeUnmount(() => {
   window.removeEventListener("resize", handleResize);
   if (chartInstance) {
@@ -227,6 +263,28 @@ onBeforeUnmount(() => {
   margin: 0;
   font-size: 18px;
   color: #24292f;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  gap: 8px;
+}
+
+.toolbar-left {
+  display: flex;
+  gap: 8px;
+}
+
+.toolbar-select {
+  padding: 8px 8px;
+  box-sizing: border-box;
+  font-size: 13px;
+  border: 1px solid #d0d7de;
+  border-radius: 4px;
+  background-color: #ffffff;
 }
 
 .card {
@@ -350,7 +408,7 @@ onBeforeUnmount(() => {
   color: #ffffff;
 }
 
-@media(max-width: 768px) {
+@media (max-width: 768px) {
   .stats-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }

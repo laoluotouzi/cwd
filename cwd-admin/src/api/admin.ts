@@ -86,6 +86,10 @@ export type CommentStatsResponse = {
 export type VisitOverviewResponse = {
 	totalPv: number;
 	totalPages: number;
+	last30Days?: {
+		date: string;
+		total: number;
+	}[];
 };
 
 export type VisitPageItem = {
@@ -226,14 +230,32 @@ export function importComments(data: any[]): Promise<{ message: string }> {
 	return post<{ message: string }>('/admin/comments/import', data);
 }
 
-export function fetchCommentStats(): Promise<CommentStatsResponse> {
-	return get<CommentStatsResponse>('/admin/stats/comments');
+export function fetchCommentStats(domain?: string): Promise<CommentStatsResponse> {
+	const searchParams = new URLSearchParams();
+	if (domain) {
+		searchParams.set('domain', domain);
+	}
+	const query = searchParams.toString();
+	const url = query ? `/admin/stats/comments?${query}` : '/admin/stats/comments';
+	return get<CommentStatsResponse>(url);
 }
 
-export function fetchVisitOverview(): Promise<VisitOverviewResponse> {
-	return get<VisitOverviewResponse>('/admin/analytics/overview');
+export function fetchVisitOverview(domain?: string): Promise<VisitOverviewResponse> {
+	const searchParams = new URLSearchParams();
+	if (domain) {
+		searchParams.set('domain', domain);
+	}
+	const query = searchParams.toString();
+	const url = query ? `/admin/analytics/overview?${query}` : '/admin/analytics/overview';
+	return get<VisitOverviewResponse>(url);
 }
 
-export function fetchVisitPages(): Promise<VisitPagesResponse> {
-	return get<VisitPagesResponse>('/admin/analytics/pages');
+export function fetchVisitPages(domain?: string): Promise<VisitPagesResponse> {
+	const searchParams = new URLSearchParams();
+	if (domain) {
+		searchParams.set('domain', domain);
+	}
+	const query = searchParams.toString();
+	const url = query ? `/admin/analytics/pages?${query}` : '/admin/analytics/pages';
+	return get<VisitPagesResponse>(url);
 }

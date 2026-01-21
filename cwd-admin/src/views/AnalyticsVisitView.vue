@@ -1,6 +1,18 @@
 <template>
   <div class="page">
-    <h2 class="page-title">访问统计</h2>
+    <div style="display: flex; align-items: center; gap: 20px">
+      <h2 class="page-title">访问统计</h2>
+      <div class="toolbar">
+        <div class="toolbar-left">
+          <select v-model="domainFilter" class="toolbar-select">
+            <option value="">全部域名</option>
+            <option v-for="item in domainOptions" :key="item" :value="item">
+              {{ item }}
+            </option>
+          </select>
+        </div>
+      </div>
+    </div>
     <div
       v-if="toastVisible"
       class="toast"
@@ -28,6 +40,15 @@
     </div>
 
     <div class="card">
+      <h3 class="card-title">最近 30 天访问趋势</h3>
+      <div v-if="loading" class="page-hint">加载中...</div>
+      <div v-else-if="error" class="page-error">{{ error }}</div>
+      <div v-else class="chart-wrapper">
+        <div ref="chartEl" class="chart"></div>
+      </div>
+    </div>
+
+    <div class="card">
       <h3 class="card-title">页面访问明细（按 PV 排序）</h3>
       <div v-if="loading" class="page-hint">加载中...</div>
       <div v-else-if="error" class="page-error">{{ error }}</div>
@@ -39,11 +60,7 @@
           <div class="domain-cell">最后访问时间</div>
           <div class="domain-cell">页面地址</div>
         </div>
-        <div
-          v-for="item in items"
-          :key="item.postSlug"
-          class="domain-table-row"
-        >
+        <div v-for="item in items" :key="item.postSlug" class="domain-table-row">
           <div class="domain-cell domain-cell-domain">
             {{ item.postTitle || item.postSlug }}
           </div>
@@ -54,12 +71,7 @@
             {{ formatTime(item.lastVisitAt) }}
           </div>
           <div class="domain-cell">
-            <a
-              v-if="item.postUrl"
-              :href="item.postUrl"
-              target="_blank"
-              rel="noreferrer"
-            >
+            <a v-if="item.postUrl" :href="item.postUrl" target="_blank" rel="noreferrer">
               {{ item.postUrl }}
             </a>
             <span v-else>-</span>
@@ -71,7 +83,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, onBeforeUnmount, ref, nextTick, watch } from "vue";
+import * as echarts from "echarts";
 import {
   fetchVisitOverview,
   fetchVisitPages,
@@ -79,17 +92,31 @@ import {
   type VisitPageItem,
 } from "../api/admin";
 
+const DOMAIN_STORAGE_KEY = "cwd_admin_domain_filter";
+
 const loading = ref(false);
 const error = ref("");
 const overview = ref<VisitOverviewResponse>({
   totalPv: 0,
   totalPages: 0,
+  last30Days: [],
 });
 const items = ref<VisitPageItem[]>([]);
+
+const storedDomain =
+  typeof window !== "undefined"
+    ? window.localStorage.getItem(DOMAIN_STORAGE_KEY) || ""
+    : "";
+const domainFilter = ref(storedDomain);
+const domainOptions = ref<string[]>([]);
+const last30Days = ref<{ date: string; total: number }[]>([]);
 
 const toastMessage = ref("");
 const toastType = ref<"success" | "error">("success");
 const toastVisible = ref(false);
+
+const chartEl = ref<HTMLDivElement | null>(null);
+let chartInstance: echarts.ECharts | null = null;
 
 function showToast(msg: string, type: "success" | "error" = "success") {
   toastMessage.value = msg;
@@ -116,28 +143,157 @@ function formatTime(value: string | null): string {
   return `${y}-${m}-${d} ${h}:${mm}`;
 }
 
+function extractDomain(source: string | null | undefined): string | null {
+  if (!source) {
+    return null;
+  }
+  const value = source.trim();
+  if (!value) {
+    return null;
+  }
+  if (!/^https?:\/\//i.test(value)) {
+    return null;
+  }
+  try {
+    const url = new URL(value);
+    return url.hostname.toLowerCase();
+  } catch {
+    return null;
+  }
+}
+
 async function loadData() {
   loading.value = true;
   error.value = "";
   try {
+    const domain = domainFilter.value || undefined;
     const [overviewRes, pagesRes] = await Promise.all([
-      fetchVisitOverview(),
-      fetchVisitPages(),
+      fetchVisitOverview(domain),
+      fetchVisitPages(domain),
     ]);
-    overview.value = overviewRes;
+    overview.value = {
+      totalPv: overviewRes.totalPv,
+      totalPages: overviewRes.totalPages,
+      last30Days: Array.isArray(overviewRes.last30Days)
+        ? overviewRes.last30Days
+        : [],
+    };
     items.value = pagesRes.items || [];
+    last30Days.value = Array.isArray(overviewRes.last30Days)
+      ? overviewRes.last30Days
+      : [];
+
+    const domains = new Set<string>();
+    for (const item of items.value) {
+      const domainFromUrl =
+        extractDomain(item.postUrl) || extractDomain(item.postSlug);
+      if (domainFromUrl) {
+        domains.add(domainFromUrl);
+      }
+    }
+    const options = Array.from(domains);
+    if (domainFilter.value && !options.includes(domainFilter.value)) {
+      options.unshift(domainFilter.value);
+    }
+    domainOptions.value = options;
   } catch (e: any) {
     const msg = e.message || "加载访问统计数据失败";
     error.value = msg;
     showToast(msg, "error");
   } finally {
     loading.value = false;
+    await nextTick();
+    if (!error.value && last30Days.value.length > 0) {
+      renderChart();
+    } else if (chartInstance) {
+      chartInstance.clear();
+    }
+  }
+}
+
+function renderChart() {
+  const el = chartEl.value;
+  if (!el) {
+    return;
+  }
+  if (!chartInstance) {
+    chartInstance = echarts.init(el);
+  }
+  const dates = last30Days.value.map((item) => item.date.slice(5));
+  const values = last30Days.value.map((item) => item.total);
+  const option: echarts.EChartsOption = {
+    tooltip: {
+      trigger: "axis",
+    },
+    grid: {
+      left: 40,
+      right: 16,
+      top: 24,
+      bottom: 32,
+    },
+    xAxis: {
+      type: "category",
+      data: dates,
+      boundaryGap: false,
+      axisTick: {
+        alignWithLabel: true,
+      },
+    },
+    yAxis: {
+      type: "value",
+      minInterval: 1,
+    },
+    series: [
+      {
+        type: "line",
+        smooth: true,
+        data: values,
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: "rgba(56, 189, 248, 0.80)" },
+            { offset: 1, color: "rgba(56, 189, 248, 0.2)" },
+          ]),
+        },
+        lineStyle: {
+          width: 2,
+          color: "#0ea5e9",
+        },
+        symbol: "circle",
+        symbolSize: 6,
+      },
+    ],
+  };
+  chartInstance.setOption(option);
+}
+
+function handleResize() {
+  if (chartInstance) {
+    chartInstance.resize();
   }
 }
 
 onMounted(() => {
   loadData();
+  window.addEventListener("resize", handleResize);
 });
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", handleResize);
+  if (chartInstance) {
+    chartInstance.dispose();
+    chartInstance = null;
+  }
+});
+
+watch(
+  domainFilter,
+  (value) => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(DOMAIN_STORAGE_KEY, value || "");
+    }
+    loadData();
+  }
+);
 </script>
 
 <style scoped>
@@ -151,6 +307,28 @@ onMounted(() => {
   margin: 0;
   font-size: 18px;
   color: #24292f;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  margin: 0;
+  gap: 8px;
+}
+
+.toolbar-left {
+  display: flex;
+  gap: 8px;
+}
+
+.toolbar-select {
+  padding: 8px 8px;
+  box-sizing: border-box;
+  font-size: 13px;
+  border: 1px solid #d0d7de;
+  border-radius: 4px;
+  background-color: #ffffff;
 }
 
 .card {
@@ -233,6 +411,15 @@ onMounted(() => {
   font-weight: 500;
 }
 
+.chart-wrapper {
+  margin-top: 4px;
+}
+
+.chart {
+  width: 100%;
+  height: 260px;
+}
+
 .toast {
   position: fixed;
   top: 20px;
@@ -263,4 +450,3 @@ onMounted(() => {
   }
 }
 </style>
-

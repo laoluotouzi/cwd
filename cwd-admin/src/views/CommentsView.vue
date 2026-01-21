@@ -251,7 +251,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, computed } from "vue";
+import { onMounted, ref, computed, watch } from "vue";
 import { useRoute, useRouter } from "vue-router";
 import {
   CommentItem,
@@ -265,6 +265,8 @@ import {
   blockEmail,
 } from "../api/admin";
 
+const DOMAIN_STORAGE_KEY = "cwd_admin_domain_filter";
+
 const route = useRoute();
 const router = useRouter();
 
@@ -273,7 +275,11 @@ const pagination = ref<{ page: number; total: number }>({ page: 1, total: 1 });
 const loading = ref(false);
 const error = ref("");
 const statusFilter = ref("");
-const domainFilter = ref("");
+const storedDomain =
+  typeof window !== "undefined"
+    ? window.localStorage.getItem(DOMAIN_STORAGE_KEY) || ""
+    : "";
+const domainFilter = ref(storedDomain);
 const jumpPageInput = ref("");
 const editVisible = ref(false);
 const editSaving = ref(false);
@@ -565,6 +571,15 @@ onMounted(() => {
 
   loadComments(initialPage);
 });
+
+watch(
+  domainFilter,
+  (value) => {
+    if (typeof window !== "undefined") {
+      window.localStorage.setItem(DOMAIN_STORAGE_KEY, value || "");
+    }
+  }
+);
 </script>
 
 <style scoped>

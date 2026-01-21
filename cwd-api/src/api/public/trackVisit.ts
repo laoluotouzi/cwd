@@ -7,6 +7,25 @@ type TrackVisitBody = {
 	postUrl?: string;
 };
 
+function extractDomain(source: string | null | undefined): string | null {
+	if (!source) {
+		return null;
+	}
+	const value = source.trim();
+	if (!value) {
+		return null;
+	}
+	if (!/^https?:\/\//i.test(value)) {
+		return null;
+	}
+	try {
+		const url = new URL(value);
+		return url.hostname.toLowerCase();
+	} catch {
+		return null;
+	}
+}
+
 export const trackVisit = async (c: Context<{ Bindings: Bindings }>) => {
 	try {
 		const body = (await c.req.json().catch(() => ({}))) as TrackVisitBody;
@@ -23,7 +42,18 @@ export const trackVisit = async (c: Context<{ Bindings: Bindings }>) => {
 			'CREATE TABLE IF NOT EXISTS page_stats (id INTEGER PRIMARY KEY AUTOINCREMENT, post_slug TEXT UNIQUE NOT NULL, post_title TEXT, post_url TEXT, pv INTEGER NOT NULL DEFAULT 0, last_visit_at TEXT, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)'
 		).run();
 
-		const now = new Date().toISOString();
+		await c.env.CWD_DB.prepare(
+			'CREATE TABLE IF NOT EXISTS page_visit_daily (id INTEGER PRIMARY KEY AUTOINCREMENT, date TEXT NOT NULL, domain TEXT, count INTEGER NOT NULL DEFAULT 0, created_at TEXT NOT NULL, updated_at TEXT NOT NULL)'
+		).run();
+
+		const nowDate = new Date();
+		const nowIso = nowDate.toISOString();
+		const today = nowIso.slice(0, 10);
+
+		const domain =
+			extractDomain(rawPostUrl) ||
+			extractDomain(rawPostSlug) ||
+			null;
 
 		const existing = await c.env.CWD_DB.prepare(
 			'SELECT id, pv FROM page_stats WHERE post_slug = ?'
@@ -40,9 +70,9 @@ export const trackVisit = async (c: Context<{ Bindings: Bindings }>) => {
 					rawPostTitle || null,
 					rawPostUrl || null,
 					1,
-					now,
-					now,
-					now
+					nowIso,
+					nowIso,
+					nowIso
 				)
 				.run();
 		} else {
@@ -54,10 +84,46 @@ export const trackVisit = async (c: Context<{ Bindings: Bindings }>) => {
 					rawPostTitle || null,
 					rawPostUrl || null,
 					newPv,
-					now,
-					now,
+					nowIso,
+					nowIso,
 					existing.id
 				)
+				.run();
+		}
+
+		let dailyRow:
+			| {
+					id: number;
+					count: number;
+			  }
+			| null = null;
+
+		if (domain) {
+			dailyRow = await c.env.CWD_DB.prepare(
+				'SELECT id, count FROM page_visit_daily WHERE date = ? AND domain = ?'
+			)
+				.bind(today, domain)
+				.first<{ id: number; count: number }>();
+		} else {
+			dailyRow = await c.env.CWD_DB.prepare(
+				'SELECT id, count FROM page_visit_daily WHERE date = ? AND domain IS NULL'
+			)
+				.bind(today)
+				.first<{ id: number; count: number }>();
+		}
+
+		if (!dailyRow) {
+			await c.env.CWD_DB.prepare(
+				'INSERT INTO page_visit_daily (date, domain, count, created_at, updated_at) VALUES (?, ?, ?, ?, ?)'
+			)
+				.bind(today, domain, 1, nowIso, nowIso)
+				.run();
+		} else {
+			const newCount = (dailyRow.count || 0) + 1;
+			await c.env.CWD_DB.prepare(
+				'UPDATE page_visit_daily SET count = ?, updated_at = ? WHERE id = ?'
+			)
+				.bind(newCount, nowIso, dailyRow.id)
 				.run();
 		}
 
