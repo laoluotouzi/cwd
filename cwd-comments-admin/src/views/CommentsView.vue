@@ -38,6 +38,9 @@
                 <div class="cell-author-name">{{ item.name }}</div>
                 <div class="cell-author-email">{{ item.email }}</div>
                 <span class="cell-time">{{ formatDate(item.created) }}</span>
+                <div v-if="item.ipAddress" class="cell-author-ip">
+                  <span class="cell-ip-text" @click="handleBlockIp(item)" title="屏蔽该 IP">{{ item.ipAddress }}</span>
+                </div>
               </div>
             </div>
           </div>
@@ -176,6 +179,7 @@ import {
   fetchComments,
   deleteComment,
   updateCommentStatus,
+  blockIp,
 } from "../api/admin";
 
 const comments = ref<CommentItem[]>([]);
@@ -289,6 +293,21 @@ async function removeComment(item: CommentItem) {
     comments.value = comments.value.filter((c) => c.id !== item.id);
   } catch (e: any) {
     error.value = e.message || "删除失败";
+  }
+}
+
+async function handleBlockIp(item: CommentItem) {
+  if (!item.ipAddress) {
+    return;
+  }
+  if (!window.confirm(`确认将 IP ${item.ipAddress} 加入黑名单吗？`)) {
+    return;
+  }
+  try {
+    const res = await blockIp(item.ipAddress);
+    window.alert(res.message || "已加入 IP 黑名单");
+  } catch (e: any) {
+    error.value = e.message || "屏蔽 IP 失败";
   }
 }
 
@@ -620,5 +639,13 @@ onMounted(() => {
   border-radius: 4px;
   border: 1px solid #d0d7de;
   font-size: 12px;
+}
+
+.cell-ip-text {
+  cursor: pointer;
+}
+
+.cell-ip-text:hover {
+  text-decoration: underline;
 }
 </style>

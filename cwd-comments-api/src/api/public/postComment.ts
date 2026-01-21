@@ -52,6 +52,17 @@ export const postComment = async (c: Context<{ Bindings: Bindings }>) => {
     .first<string>('value');
   const requireReview = requireReviewRaw === '1';
 
+  const blockedIpsRow = await c.env.CWD_DB.prepare('SELECT value FROM Settings WHERE key = ?')
+    .bind('comment_blocked_ips')
+    .first<{ value: string }>();
+  const blockedIpsValue = blockedIpsRow?.value || '';
+  const blockedIps = blockedIpsValue
+    ? blockedIpsValue.split(',').map((d) => d.trim()).filter(Boolean)
+    : [];
+  if (blockedIps.length && blockedIps.includes(ip)) {
+    return c.json({ message: '当前 IP 已被限制评论，请联系站长进行处理' }, 403);
+  }
+
   let isAdminComment = false;
 
   if (adminEmail && email === adminEmail) {
@@ -63,7 +74,7 @@ export const postComment = async (c: Context<{ Bindings: Bindings }>) => {
       const lockKey = `admin_lock:${ip}`;
       const isLocked = await c.env.CWD_AUTH_KV.get(lockKey);
       if (isLocked) {
-        return c.json({ message: "验证失败次数过多，请30分钟后再试" }, 403);
+        return c.json({ message: "验证失败次数过多，请 30 分钟后再试" }, 403);
       }
 
       if (!adminToken) {
@@ -79,7 +90,7 @@ export const postComment = async (c: Context<{ Bindings: Bindings }>) => {
         if (fails >= 3) {
           await c.env.CWD_AUTH_KV.put(lockKey, '1', { expirationTtl: 1800 });
           await c.env.CWD_AUTH_KV.delete(failKey);
-          return c.json({ message: "验证失败次数过多，请30分钟后再试" }, 403);
+          return c.json({ message: "验证失败次数过多，请 30 分钟后再试" }, 403);
         } else {
           await c.env.CWD_AUTH_KV.put(failKey, fails.toString(), { expirationTtl: 3600 });
           return c.json({ message: "密钥错误" }, 401);

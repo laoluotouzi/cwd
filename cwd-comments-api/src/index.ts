@@ -32,6 +32,7 @@ const COMMENT_ADMIN_ENABLED_KEY = 'comment_admin_enabled';
 const COMMENT_ALLOWED_DOMAINS_KEY = 'comment_allowed_domains';
 const COMMENT_ADMIN_KEY_HASH_KEY = 'comment_admin_key_hash';
 const COMMENT_REQUIRE_REVIEW_KEY = 'comment_require_review';
+const COMMENT_BLOCKED_IPS_KEY = 'comment_blocked_ips';
 
 
 async function loadCommentSettings(env: Bindings) {
@@ -45,10 +46,11 @@ async function loadCommentSettings(env: Bindings) {
 		COMMENT_ADMIN_ENABLED_KEY,
 		COMMENT_ALLOWED_DOMAINS_KEY,
 		COMMENT_ADMIN_KEY_HASH_KEY,
-		COMMENT_REQUIRE_REVIEW_KEY
+		COMMENT_REQUIRE_REVIEW_KEY,
+		COMMENT_BLOCKED_IPS_KEY
 	];
 	const { results } = await env.CWD_DB.prepare(
-		'SELECT key, value FROM Settings WHERE key IN (?, ?, ?, ?, ?, ?, ?)'
+		'SELECT key, value FROM Settings WHERE key IN (?, ?, ?, ?, ?, ?, ?, ?)'
 	)
 		.bind(...keys)
 		.all<{ key: string; value: string }>();
@@ -66,6 +68,11 @@ async function loadCommentSettings(env: Bindings) {
 	const requireReviewRaw = map.get(COMMENT_REQUIRE_REVIEW_KEY) ?? null;
 	const requireReview = requireReviewRaw === '1';
 
+	const blockedIpsRaw = map.get(COMMENT_BLOCKED_IPS_KEY) ?? '';
+	const blockedIps = blockedIpsRaw
+		? blockedIpsRaw.split(',').map((d) => d.trim()).filter(Boolean)
+		: [];
+
 	// 解析允许的域名列表
 	const allowedDomainsRaw = map.get(COMMENT_ALLOWED_DOMAINS_KEY) ?? '';
 	const allowedDomains = allowedDomainsRaw
@@ -79,6 +86,7 @@ async function loadCommentSettings(env: Bindings) {
 		adminEnabled,
 		allowedDomains,
 		requireReview,
+		blockedIps,
 		adminKey: map.get(COMMENT_ADMIN_KEY_HASH_KEY) ?? null,
 		adminKeySet: !!map.get(COMMENT_ADMIN_KEY_HASH_KEY)
 	};
@@ -94,6 +102,7 @@ async function saveCommentSettings(
 		allowedDomains?: string[];
 		adminKey?: string;
 		requireReview?: boolean;
+		blockedIps?: string[];
 	}
 ) {
 	await env.CWD_DB.prepare(
@@ -134,6 +143,10 @@ async function saveCommentSettings(
 						? '1'
 						: '0'
 					: undefined
+		},
+		{
+			key: COMMENT_BLOCKED_IPS_KEY,
+			value: settings.blockedIps ? settings.blockedIps.join(',') : undefined
 		}
 	];
 
@@ -192,6 +205,7 @@ app.get('/api/config/comments', async (c) => {
 		const {
 			adminKey,
 			adminKeySet,
+			blockedIps,
 			...publicSettings
 		} = settings as any;
 
@@ -257,6 +271,7 @@ app.put('/admin/settings/comments', async (c) => {
 		const rawAllowedDomains = Array.isArray(body.allowedDomains) ? body.allowedDomains : [];
 		const rawAdminKey = typeof body.adminKey === 'string' ? body.adminKey : undefined;
 		const rawRequireReview = body.requireReview;
+		const rawBlockedIps = Array.isArray(body.blockedIps) ? body.blockedIps : [];
 
 		const adminEmail = rawAdminEmail.trim();
 		const adminBadge = rawAdminBadge.trim();
@@ -273,6 +288,9 @@ app.put('/admin/settings/comments', async (c) => {
 			typeof rawRequireReview === 'boolean'
 				? rawRequireReview
 				: rawRequireReview === '1' || rawRequireReview === 1;
+		const blockedIps = rawBlockedIps
+			.map((d: any) => (typeof d === 'string' ? d.trim() : ''))
+			.filter(Boolean);
 
 		if (adminEmail && !isValidEmail(adminEmail)) {
 			return c.json({ message: '邮箱格式不正确' }, 400);
@@ -285,12 +303,52 @@ app.put('/admin/settings/comments', async (c) => {
 			adminEnabled,
 			allowedDomains,
 			adminKey,
-			requireReview
+			requireReview,
+			blockedIps
 		});
 
 		return c.json({ message: '保存成功' });
 	} catch (e: any) {
 		return c.json({ message: e.message || '保存失败' }, 500);
+	}
+});
+
+app.post('/admin/comments/block-ip', async (c) => {
+	try {
+		const body = await c.req.json();
+		const rawIp = typeof body.ip === 'string' ? body.ip : '';
+		const ip = rawIp.trim();
+
+		if (!ip) {
+			return c.json({ message: 'IP 地址不能为空' }, 400);
+		}
+
+		await c.env.CWD_DB.prepare(
+			'CREATE TABLE IF NOT EXISTS Settings (key TEXT PRIMARY KEY, value TEXT NOT NULL)'
+		).run();
+
+		const row = await c.env.CWD_DB.prepare('SELECT value FROM Settings WHERE key = ?')
+			.bind(COMMENT_BLOCKED_IPS_KEY)
+			.first<{ value: string }>();
+
+		const existing = row?.value || '';
+		const list = existing
+			? existing.split(',').map((d) => d.trim()).filter(Boolean)
+			: [];
+
+		if (!list.includes(ip)) {
+			list.push(ip);
+			const joined = list.join(',');
+			await c.env.CWD_DB.prepare(
+				'REPLACE INTO Settings (key, value) VALUES (?, ?)'
+			)
+				.bind(COMMENT_BLOCKED_IPS_KEY, joined)
+				.run();
+		}
+
+		return c.json({ message: '已加入 IP 黑名单' });
+	} catch (e: any) {
+		return c.json({ message: e.message || '操作失败' }, 500);
 	}
 });
 

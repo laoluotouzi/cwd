@@ -48,6 +48,15 @@
             placeholder="例如: example.com, test.com"
           ></textarea>
         </div>
+      <div class="form-item">
+        <label class="form-label">IP 黑名单（多个 IP 用逗号或换行分隔，留空则不限制）</label>
+        <textarea
+          v-model="blockedIps"
+          class="form-input"
+          rows="3"
+          placeholder="例如: 1.1.1.1, 2.2.2.2"
+        ></textarea>
+      </div>
         <div class="form-item">
           <label class="form-label">管理员评论密钥</label>
           <div class="form-hint" style="margin-bottom: 4px;">
@@ -305,6 +314,7 @@ const commentAdminBadge = ref("");
 const avatarPrefix = ref("");
 const commentAdminEnabled = ref(false);
 const allowedDomains = ref("");
+const blockedIps = ref("");
 const commentAdminKey = ref("");
 const adminKeySet = ref(false);
 const requireReview = ref(false);
@@ -364,6 +374,9 @@ async function load() {
     commentAdminEnabled.value = !!commentRes.adminEnabled;
     allowedDomains.value = commentRes.allowedDomains
       ? commentRes.allowedDomains.join(", ")
+      : "";
+    blockedIps.value = commentRes.blockedIps
+      ? commentRes.blockedIps.join(", ")
       : "";
     commentAdminKey.value = commentRes.adminKey || "";
     adminKeySet.value = !!commentRes.adminKeySet;
@@ -498,6 +511,10 @@ async function saveComment() {
         .filter(Boolean),
       adminKey: commentAdminKey.value || undefined,
       requireReview: requireReview.value,
+      blockedIps: blockedIps.value
+        .split(/[,，\n]/)
+        .map((d) => d.trim())
+        .filter(Boolean),
     });
 
     showToast(res.message || "保存成功", "success");
