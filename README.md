@@ -9,7 +9,7 @@
 
 基于 Cloudflare Workers 与全球边缘网络的免服务器、极速安全、即插即用评论系统。
 
-[文档地址](https://cwd-docs.zishu.me)
+[使用文档](https://cwd-docs.zishu.me)
 
 **评论端**
 ![](https://github.com/user-attachments/assets/6ac091d8-e349-4d40-9d68-485817f63236)
