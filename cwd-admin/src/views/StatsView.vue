@@ -174,7 +174,16 @@ function renderChart() {
         type: "line",
         smooth: true,
         data: values,
-        areaStyle: {},
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            { offset: 0, color: "rgba(56, 189, 248, 0.80)" },
+            { offset: 1, color: "rgba(56, 189, 248, 0.2)" },
+          ]),
+        },
+        lineStyle: {
+          width: 2,
+          color: "#0ea5e9",
+        },
         symbol: "circle",
         symbolSize: 6,
       },
