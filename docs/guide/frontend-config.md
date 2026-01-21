@@ -12,7 +12,7 @@
 <script>
 	const comments = new CWDComments({
 		el: '#comments',
-		apiBaseUrl: 'https://your-api.example.com', // 你部署的后端接口地址
+		apiBaseUrl: 'https://your-api.example.com', // 换成你的 API 地址
 	});
 	comments.mount();
 </script>
@@ -45,16 +45,20 @@
 | `updateConfig(config)` | 更新配置（支持动态切换主题等） |
 | `getConfig()`          | 获取当前配置                   |
 
-## 使用示例
+**使用示例**
 
 ```javascript
 // 动态切换主题
 comments.updateConfig({ theme: 'dark' });
 ```
 
-### 博客程序使用示例
+## 其他框架示例
+
+如果你有其他博客框架的需求，欢迎在下方评论区留言。
 
 ### HTML
+
+此方法适用于绝大多数博客框架，包括 Hexo、Hugo、Jekyll、WordPress 等。
 
 ```html
 <div id="comments"></div>
@@ -62,7 +66,7 @@ comments.updateConfig({ theme: 'dark' });
 <script>
 	const comments = new CWDComments({
 		el: '#comments',
-		apiBaseUrl: 'https://your-api.example.com', // 你部署的后端接口地址
+		apiBaseUrl: 'https://your-api.example.com', // 换成你的 API 地址
 	});
 	comments.mount();
 </script>
@@ -77,9 +81,55 @@ comments.updateConfig({ theme: 'dark' });
   document.addEventListener('DOMContentLoaded', () => {
     const comments = new window.CWDComments({
       el: '#comments',
-      apiBaseUrl: 'https://your-api.example.com',
+      apiBaseUrl: 'https://your-api.example.com', // 换成你的 API 地址
     });
     comments.mount();
   });
+</script>
+```
+
+### Vue
+
+在 Vue 单文件组件里封装。
+
+`CommentsWidget.vue`:
+
+```html
+<template>
+	<div ref="comments"></div>
+</template>
+
+<script setup>
+	import { onMounted, onBeforeUnmount, ref } from 'vue';
+
+	const comments = ref(null);
+	let instance = null;
+
+	onMounted(async () => {
+		if (!window.CWDComments) {
+			await loadScript('https://cwd.zishu.me/cwd.js');
+		}
+
+		instance = new window.CWDComments({
+			el: comments.value,
+			apiBaseUrl: 'https://your-api.example.com', // 换成你的 API 地址
+		});
+		instance.mount();
+	});
+
+	onBeforeUnmount(() => {
+		instance = null;
+	});
+
+	function loadScript(src) {
+		return new Promise((resolve, reject) => {
+			const script = document.createElement('script');
+			script.src = src;
+			script.async = true;
+			script.onload = () => resolve();
+			script.onerror = (e) => reject(e);
+			document.head.appendChild(script);
+		});
+	}
 </script>
 ```

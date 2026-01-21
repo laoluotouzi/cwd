@@ -39,7 +39,7 @@ CWD 评论系统。
 
 ```bash
 # 克隆项目
-git clone https://github.com/anghunk/CWD
+git clone https://github.com/anghunk/cwd
 
 # API 项目
 cd cwd-api
