@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS Comment (
     content_text TEXT NOT NULL,
     content_html TEXT NOT NULL,
     parent_id INTEGER,
+    likes INTEGER NOT NULL DEFAULT 0,
     priority INTEGER NOT NULL DEFAULT 1,
     status TEXT DEFAULT 'approved',
     -- 建立自引用外键约束（父子评论关系）

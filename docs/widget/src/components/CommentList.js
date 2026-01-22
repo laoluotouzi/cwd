@@ -100,7 +100,8 @@ export class CommentList extends Component {
           onSubmitReply: (commentId) => this.handleSubmitReply(commentId),
           onCancelReply: () => this.handleCancelReply(),
           onUpdateReplyContent: (content) => this.handleUpdateReplyContent(content),
-          onClearReplyError: () => this.handleClearReplyError()
+          onClearReplyError: () => this.handleClearReplyError(),
+          onLikeComment: (commentId) => this.handleLikeComment(commentId)
         });
         commentItem.render();
         // 缓存 CommentItem 实例
@@ -216,6 +217,12 @@ export class CommentList extends Component {
   handleClearReplyError() {
     if (this.props.onClearReplyError) {
       this.props.onClearReplyError();
+    }
+  }
+
+  handleLikeComment(commentId) {
+    if (this.props.onLikeComment) {
+      this.props.onLikeComment(commentId);
     }
   }
 

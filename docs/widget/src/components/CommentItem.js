@@ -105,6 +105,28 @@ export class CommentItem extends Component {
                       },
                       text: '回复'
                     }),
+                    this.createElement('span', {
+                      className: 'cwd-comment-like',
+                      children: [
+                        this.createElement('button', {
+                          className: 'cwd-comment-like-button',
+                          attributes: {
+                            type: 'button',
+                            onClick: () => this.handleLikeComment()
+                          },
+                          text: '赞'
+                        }),
+                        this.createTextElement(
+                          'span',
+                          String(
+                            typeof comment.likes === 'number' && Number.isFinite(comment.likes) && comment.likes >= 0
+                              ? comment.likes
+                              : 0
+                          ),
+                          'cwd-comment-like-count'
+                        )
+                      ]
+                    }),
                     this.createTextElement('span', formatRelativeTime(comment.created), 'cwd-comment-time')
                   ]
                 })
@@ -256,6 +278,12 @@ export class CommentItem extends Component {
   handleReply() {
     if (this.props.onReply) {
       this.props.onReply(this.props.comment.id);
+    }
+  }
+
+  handleLikeComment() {
+    if (this.props.onLikeComment) {
+      this.props.onLikeComment(this.props.comment.id);
     }
   }
 

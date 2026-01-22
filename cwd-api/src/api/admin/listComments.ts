@@ -53,6 +53,7 @@ export const listComments = async (c: Context<{ Bindings: Bindings }>) => {
 			contentHtml: row.content_html,
 			status: row.status,
 			priority: row.priority,
+			likes: typeof row.likes === 'number' && Number.isFinite(row.likes) && row.likes >= 0 ? row.likes : 0,
 			ua: row.ua,
 			avatar: await getCravatar(row.email, avatarPrefix || undefined)
 		}))

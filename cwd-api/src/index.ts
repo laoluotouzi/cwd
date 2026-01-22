@@ -27,6 +27,7 @@ import { getDomains } from './api/admin/getDomains';
 import { trackVisit } from './api/public/trackVisit';
 import { getVisitOverview, getVisitPages } from './api/admin/visitAnalytics';
 import { getLikeStatus, likePage } from './api/public/like';
+import { likeComment } from './api/public/likeComment';
 import { listLikes } from './api/admin/listLikes';
 import { getLikeStats } from './api/admin/likeStats';
 
@@ -223,6 +224,7 @@ app.post('/api/verify-admin', verifyAdminKey);
 app.post('/api/analytics/visit', trackVisit);
 app.get('/api/like', getLikeStatus);
 app.post('/api/like', likePage);
+app.post('/api/comments/like', likeComment);
 app.get('/api/config/comments', async (c) => {
 	try {
 		const settings = await loadCommentSettings(c.env);

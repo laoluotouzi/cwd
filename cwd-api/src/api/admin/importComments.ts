@@ -119,13 +119,14 @@ export const importComments = async (c: Context<{ Bindings: Bindings }>) => {
 				content_text,
 				content_html,
 				parent_id,
-				status
+				status,
+				likes
 			} = comment;
 
             const fields = [
                 'created', 'post_slug', 'name', 'email', 'url',
                 'ip_address', 'device', 'os', 'browser', 'ua',
-                'content_text', 'content_html', 'parent_id', 'status'
+                'content_text', 'content_html', 'parent_id', 'status', 'likes'
             ];
             const values = [
                 created || Date.now(),
@@ -141,7 +142,8 @@ export const importComments = async (c: Context<{ Bindings: Bindings }>) => {
                 content_text || "",
                 content_html || "",
                 parent_id || null,
-                status || "approved"
+                status || "approved",
+                typeof likes === 'number' && Number.isFinite(likes) && likes >= 0 ? likes : 0
             ];
 
             if (id !== undefined && id !== null) {

@@ -19,6 +19,7 @@ export type CommentItem = {
 	contentHtml: string;
 	status: string;
 	priority?: number;
+	likes?: number;
 	ua?: string | null;
 };
 

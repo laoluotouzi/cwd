@@ -176,7 +176,8 @@ export class CWDComments {
 				this.store = createCommentStore(
 					this.config,
 					api.fetchComments.bind(api),
-					api.submitComment.bind(api)
+					api.submitComment.bind(api),
+					typeof api.likeComment === 'function' ? api.likeComment.bind(api) : undefined
 				);
 
 				this.unsubscribe = this.store.store.subscribe((state) => {
@@ -379,6 +380,11 @@ export class CWDComments {
 				onPrevPage: () => this.store.goToPage(state.pagination.page - 1),
 				onNextPage: () => this.store.goToPage(state.pagination.page + 1),
 				onGoToPage: (page) => this.store.goToPage(page),
+				onLikeComment: (commentId) => {
+					if (this.store && typeof this.store.likeComment === 'function') {
+						this.store.likeComment(commentId);
+					}
+				},
 			});
 			this.commentList.render();
 		}

@@ -90,9 +90,10 @@ class Store {
  * @param {Object} config - 配置对象
  * @param {Function} fetchComments - 获取评论的函数
  * @param {Function} submitComment - 提交评论的函数
+ * @param {Function} likeCommentFn - 点赞评论的函数
  * @returns {Object}
  */
-export function createCommentStore(config, fetchComments, submitComment) {
+export function createCommentStore(config, fetchComments, submitComment, likeCommentFn) {
 	// 从 localStorage 加载用户信息
 	const savedInfo = loadUserInfo();
 
@@ -128,6 +129,7 @@ export function createCommentStore(config, fetchComments, submitComment) {
 		replyError: null,
 		likeCount: 0,
 		liked: false,
+		commentLikeLoadingId: null,
 	});
 
 	// 监听用户信息变化，自动保存到 localStorage
@@ -173,6 +175,78 @@ export function createCommentStore(config, fetchComments, submitComment) {
 			likeCount: safeCount,
 			liked: !!liked,
 		});
+	}
+
+	async function likeComment(commentId) {
+		const state = store.getState();
+		if (!likeCommentFn || state.commentLikeLoadingId === commentId) {
+			return;
+		}
+		const id =
+			typeof commentId === 'number'
+				? commentId
+				: typeof commentId === 'string' && commentId.trim()
+				? Number.parseInt(commentId.trim(), 10)
+				: NaN;
+		if (!Number.isFinite(id) || id <= 0) {
+			return;
+		}
+		store.setState({
+			commentLikeLoadingId: id,
+		});
+		try {
+			const safeComments = Array.isArray(state.comments) ? state.comments : [];
+			const nextComments = safeComments.map((item) => {
+				if (!item || typeof item.id !== 'number') {
+					return item;
+				}
+				if (item.id === id) {
+					const current =
+						typeof item.likes === 'number' && Number.isFinite(item.likes) && item.likes >= 0
+							? item.likes
+							: 0;
+					return {
+						...item,
+						likes: current + 1,
+					};
+				}
+				if (Array.isArray(item.replies) && item.replies.length > 0) {
+					const updatedReplies = item.replies.map((reply) => {
+						if (!reply || typeof reply.id !== 'number') {
+							return reply;
+						}
+						if (reply.id === id) {
+							const current =
+								typeof reply.likes === 'number' && Number.isFinite(reply.likes) && reply.likes >= 0
+									? reply.likes
+									: 0;
+							return {
+								...reply,
+								likes: current + 1,
+							};
+						}
+						return reply;
+					});
+					return {
+						...item,
+						replies: updatedReplies,
+					};
+				}
+				return item;
+			});
+			store.setState({
+				comments: nextComments,
+			});
+			await likeCommentFn(id);
+		} catch (e) {
+		} finally {
+			const latest = store.getState();
+			if (latest.commentLikeLoadingId === id) {
+				store.setState({
+					commentLikeLoadingId: null,
+				});
+			}
+		}
 	}
 
 	/**
@@ -395,5 +469,6 @@ export function createCommentStore(config, fetchComments, submitComment) {
 		clearSuccess,
 		goToPage,
 		setLikeState,
+		likeComment,
 	};
 }

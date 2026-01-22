@@ -22,6 +22,7 @@
           <div class="table-cell table-cell-author">用户</div>
           <div class="table-cell table-cell-content">评论信息</div>
           <div class="table-cell table-cell-path">评论地址</div>
+          <div class="table-cell table-cell-likes">点赞</div>
           <div class="table-cell table-cell-status">状态</div>
           <div class="table-cell table-cell-actions">操作</div>
         </div>
@@ -68,6 +69,9 @@
               :title="item.postSlug"
               >{{ item.postSlug }}</a
             >
+          </div>
+          <div class="table-cell table-cell-likes">
+            <span class="cell-likes-number">{{ typeof item.likes === "number" && Number.isFinite(item.likes) && item.likes >= 0 ? item.likes : 0 }}</span>
           </div>
           <div class="table-cell table-cell-status">
             <div class="cell-status-wrapper">
@@ -676,6 +680,12 @@ watch(domainFilter, () => {
   flex-shrink: 0;
 }
 
+.table-cell-likes {
+  width: 80px;
+  flex-shrink: 0;
+  justify-content: center;
+}
+
 .table-cell-time {
   width: 150px;
   flex-shrink: 0;
@@ -752,6 +762,11 @@ watch(domainFilter, () => {
 
 .cell-time {
   font-size: 12px;
+  color: #57606a;
+}
+
+.cell-likes-number {
+  font-size: 13px;
   color: #57606a;
 }
 

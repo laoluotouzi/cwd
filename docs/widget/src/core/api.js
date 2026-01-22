@@ -9,7 +9,7 @@
  * @param {string} config.postSlug - 文章标识符
  * @param {string} config.postTitle - 文章标题（可选）
  * @param {string} config.postUrl - 文章 URL（可选）
- * @returns {Object}
+	 * @returns {Object}
  */
 export function createApiClient(config) {
 	const baseUrl = config.apiBaseUrl.replace(/\/$/, '');
@@ -178,12 +178,41 @@ export function createApiClient(config) {
         return response.json();
     }
 
-	return {
+    async function likeComment(commentId) {
+        const id =
+            typeof commentId === 'number'
+                ? commentId
+                : typeof commentId === 'string' && commentId.trim()
+                ? Number.parseInt(commentId.trim(), 10)
+                : NaN;
+        if (!Number.isFinite(id) || id <= 0) {
+            throw new Error('Invalid comment id');
+        }
+        const response = await fetch(`${baseUrl}/api/comments/like`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ id })
+        });
+        if (!response.ok) {
+            let msg = response.statusText;
+            try {
+                const json = await response.json();
+                if (json.message) msg = json.message;
+            } catch (e) {}
+            throw new Error(msg);
+        }
+        return response.json();
+    }
+
+		return {
 		fetchComments,
 		submitComment,
         verifyAdminKey,
         trackVisit,
         getLikeStatus,
-        likePage
+        likePage,
+        likeComment
 	};
 }
