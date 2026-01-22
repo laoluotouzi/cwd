@@ -23,6 +23,7 @@ import { getAdminEmail } from './api/admin/getAdminEmail';
 import { setAdminEmail } from './api/admin/setAdminEmail';
 import { testEmail } from './api/admin/testEmail';
 import { getStats } from './api/admin/getStats';
+import { getDomains } from './api/admin/getDomains';
 import { trackVisit } from './api/public/trackVisit';
 import { getVisitOverview, getVisitPages } from './api/admin/visitAnalytics';
 
@@ -243,6 +244,7 @@ app.post('/admin/comments/import', importComments);
 app.put('/admin/comments/status', updateStatus);
 app.put('/admin/comments/update', updateComment);
 app.get('/admin/stats/comments', getStats);
+app.get('/admin/stats/domains', getDomains);
 app.get('/admin/analytics/overview', getVisitOverview);
 app.get('/admin/analytics/pages', getVisitPages);
 app.get('/admin/settings/email', getAdminEmail);

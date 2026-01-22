@@ -55,7 +55,7 @@
       <h3 class="card-title">最近 30 天访问趋势</h3>
       <div v-if="loading" class="page-hint">加载中...</div>
       <div v-else-if="error" class="page-error">{{ error }}</div>
-      <div v-else class="chart-wrapper">
+      <div class="chart-wrapper">
         <div ref="chartEl" class="chart"></div>
       </div>
     </div>
@@ -127,6 +127,7 @@ import * as echarts from "echarts";
 import {
   fetchVisitOverview,
   fetchVisitPages,
+  fetchDomainList,
   type VisitOverviewResponse,
   type VisitPageItem,
 } from "../api/admin";
@@ -252,20 +253,6 @@ async function loadData() {
     last30Days.value = Array.isArray(overviewRes.last30Days)
       ? overviewRes.last30Days
       : [];
-
-    const domains = new Set<string>();
-    for (const item of items.value) {
-      const domainFromUrl =
-        extractDomain(item.postUrl) || extractDomain(item.postSlug);
-      if (domainFromUrl) {
-        domains.add(domainFromUrl);
-      }
-    }
-    const options = Array.from(domains);
-    if (domainFilter.value && !options.includes(domainFilter.value)) {
-      options.unshift(domainFilter.value);
-    }
-    domainOptions.value = options;
   } catch (e: any) {
     const msg = e.message || "加载访问统计数据失败";
     error.value = msg;
@@ -274,11 +261,24 @@ async function loadData() {
     loading.value = false;
     listLoading.value = false;
     await nextTick();
-    if (!error.value && last30Days.value.length > 0) {
+    if (!error.value) {
       renderChart();
-    } else if (chartInstance) {
-      chartInstance.clear();
     }
+  }
+}
+
+async function loadDomains() {
+  try {
+    const res = await fetchDomainList();
+    const domains = Array.isArray(res.domains) ? res.domains : [];
+    const set = new Set(domains);
+    if (domainFilter.value && !set.has(domainFilter.value)) {
+      set.add(domainFilter.value);
+    }
+    domainOptions.value = Array.from(set);
+  } catch (e: any) {
+    const msg = e.message || "加载域名列表失败";
+    showToast(msg, "error");
   }
 }
 
@@ -370,6 +370,7 @@ function handleResize() {
 
 onMounted(() => {
   loadData();
+  loadDomains();
   window.addEventListener("resize", handleResize);
 });
 

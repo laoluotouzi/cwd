@@ -55,7 +55,7 @@
       <h3 class="card-title">最近 30 天评论数趋势</h3>
       <div v-if="statsLoading" class="page-hint">加载中...</div>
       <div v-else-if="statsError" class="page-error">{{ statsError }}</div>
-      <div v-else class="chart-wrapper">
+      <div class="chart-wrapper">
         <div ref="chartEl" class="chart"></div>
       </div>
     </div>
@@ -94,7 +94,7 @@
 <script setup lang="ts">
 import { onMounted, onBeforeUnmount, ref, nextTick, watch } from "vue";
 import * as echarts from "echarts";
-import { fetchCommentStats } from "../api/admin";
+import { fetchCommentStats, fetchDomainList } from "../api/admin";
 
 type DomainStat = {
   domain: string;
@@ -152,14 +152,6 @@ async function loadStats() {
       rejected: res.summary.rejected,
     };
     domainStats.value = res.domains;
-    const domains = Array.isArray(res.domains)
-      ? res.domains.map((item) => item.domain)
-      : [];
-    const set = new Set(domains);
-    if (domainFilter.value && !set.has(domainFilter.value)) {
-      set.add(domainFilter.value);
-    }
-    domainOptions.value = Array.from(set);
     last7Days.value = Array.isArray(res.last7Days) ? res.last7Days : [];
   } catch (e: any) {
     const msg = e.message || "加载统计数据失败";
@@ -168,11 +160,24 @@ async function loadStats() {
   } finally {
     statsLoading.value = false;
     await nextTick();
-    if (!statsError.value && last7Days.value.length > 0) {
+    if (!statsError.value) {
       renderChart();
-    } else if (chartInstance) {
-      chartInstance.clear();
     }
+  }
+}
+
+async function loadDomains() {
+  try {
+    const res = await fetchDomainList();
+    const domains = Array.isArray(res.domains) ? res.domains : [];
+    const set = new Set(domains);
+    if (domainFilter.value && !set.has(domainFilter.value)) {
+      set.add(domainFilter.value);
+    }
+    domainOptions.value = Array.from(set);
+  } catch (e: any) {
+    const msg = e.message || "加载域名列表失败";
+    showToast(msg, "error");
   }
 }
 
@@ -239,6 +244,7 @@ function handleResize() {
 
 onMounted(() => {
   loadStats();
+  loadDomains();
   window.addEventListener("resize", handleResize);
 });
 

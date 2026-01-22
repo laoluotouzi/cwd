@@ -107,6 +107,10 @@ export type VisitPagesResponse = {
 	items: VisitPageItem[];
 };
 
+export type DomainListResponse = {
+	domains: string[];
+};
+
 export async function loginAdmin(name: string, password: string): Promise<string> {
 	const res = await post<AdminLoginResponse>('/admin/login', { name, password });
 	const key = res.data.key;
@@ -264,4 +268,8 @@ export function fetchVisitPages(domain?: string, order?: 'pv' | 'latest'): Promi
 	const query = searchParams.toString();
 	const url = query ? `/admin/analytics/pages?${query}` : '/admin/analytics/pages';
 	return get<VisitPagesResponse>(url);
+}
+
+export function fetchDomainList(): Promise<DomainListResponse> {
+	return get<DomainListResponse>('/admin/stats/domains');
 }

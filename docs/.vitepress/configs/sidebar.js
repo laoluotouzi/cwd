@@ -25,4 +25,5 @@ export default [
 			{ text: '管理员 API', link: '/api/admin' },
 		],
 	},
+	{ text: '反馈', link: '/feedback' },
 ];

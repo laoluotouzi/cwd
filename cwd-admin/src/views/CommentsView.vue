@@ -257,12 +257,12 @@ import {
   CommentItem,
   CommentListResponse,
   fetchComments,
-  fetchCommentStats,
   deleteComment,
   updateCommentStatus,
   updateComment,
   blockIp,
   blockEmail,
+  fetchDomainList,
 } from "../api/admin";
 
 const DOMAIN_STORAGE_KEY = "cwd_admin_domain_filter";
@@ -558,11 +558,9 @@ onMounted(() => {
     domainFilter.value = d.trim();
   }
 
-  fetchCommentStats()
-    .then((res: CommentListResponse | any) => {
-      const domains = Array.isArray(res.domains)
-        ? res.domains.map((item: any) => item.domain)
-        : [];
+  fetchDomainList()
+    .then((res) => {
+      const domains = Array.isArray(res.domains) ? res.domains : [];
       domainOptions.value = Array.from(new Set(domains));
     })
     .catch(() => {
