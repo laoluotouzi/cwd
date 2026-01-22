@@ -3,25 +3,56 @@ import { Bindings } from '../../bindings'
 import { getCravatar } from '../../utils/getAvatar'
 
 export const getComments = async (c: Context<{ Bindings: Bindings }>) => {
-    const post_slug = c.req.query('post_slug')
+  const rawPostSlug = c.req.query('post_slug') || ''
+  const postSlug = rawPostSlug.trim()
   const page = parseInt(c.req.query('page') || '1')
   const limit = Math.min(parseInt(c.req.query('limit') || '20'), 50)
   const nested = c.req.query('nested') !== 'false'
   const avatar_prefix = c.req.query('avatar_prefix')
   const offset = (page - 1) * limit
 
-  if (!post_slug) return c.json({ message: "post_slug is required" }, 400)
+  if (!postSlug) return c.json({ message: "post_slug is required" }, 400)
+
+  let slugList: string[] = [postSlug]
+  try {
+    const url = new URL(postSlug)
+    const origin = url.origin
+    const path = url.pathname || '/'
+    if (path === '/') {
+      const withSlash = origin + '/'
+      const withoutSlash = origin
+      slugList = Array.from(new Set([withSlash, withoutSlash]))
+    } else {
+      const hasTrailingSlash = path.endsWith('/')
+      const withSlash = origin + (hasTrailingSlash ? path : path + '/')
+      const withoutSlash = origin + (hasTrailingSlash ? path.slice(0, -1) : path)
+      slugList = Array.from(new Set([withSlash, withoutSlash]))
+    }
+  } catch {
+    slugList = [postSlug]
+  }
 
   try {
-    const query = `
+    let query = `
       SELECT id, name, email, url, content_text as contentText, 
              content_html as contentHtml, created, parent_id as parentId,
              post_slug as postSlug, priority
       FROM Comment 
-      WHERE post_slug = ? AND status = "approved"
+      WHERE status = "approved" AND post_slug = ?
       ORDER BY priority DESC, created DESC
     `
-    const { results } = await c.env.CWD_DB.prepare(query).bind(post_slug).all()
+    if (slugList.length > 1) {
+      const placeholders = slugList.map(() => '?').join(', ')
+      query = `
+        SELECT id, name, email, url, content_text as contentText, 
+               content_html as contentHtml, created, parent_id as parentId,
+               post_slug as postSlug, priority
+        FROM Comment 
+        WHERE status = "approved" AND post_slug IN (${placeholders})
+        ORDER BY priority DESC, created DESC
+      `
+    }
+    const { results } = await c.env.CWD_DB.prepare(query).bind(...slugList).all()
 
     // 2. 批量处理头像并格式化
     const allComments = await Promise.all(results.map(async (row: any) => ({

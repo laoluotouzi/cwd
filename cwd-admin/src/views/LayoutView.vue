@@ -14,7 +14,7 @@
           />
         </svg>
       </button>
-      <div class="layout-title">CWD 评论后台</div>
+      <div class="layout-title">CWD 评论系统</div>
       <div class="layout-actions-wrapper">
         <div class="layout-domain-filter">
           <select v-model="domainFilter" class="layout-domain-select">

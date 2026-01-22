@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h1 class="login-title">CWD 评论后台</h1>
+      <h1 class="login-title">CWD 评论系统</h1>
       <p class="login-subtitle">简洁的自托管评论系统管理面板</p>
       <form class="login-form" @submit.prevent="handleSubmit">
         <div class="form-item">
