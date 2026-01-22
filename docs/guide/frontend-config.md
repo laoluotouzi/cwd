@@ -20,12 +20,13 @@
 
 ### 参数说明
 
-| 参数         | 类型                    | 必填 | 默认值    | 说明                      |
-| ------------ | ----------------------- | ---- | --------- | ------------------------- |
-| `el`         | `string \| HTMLElement` | 是   | -         | 挂载元素选择器或 DOM 元素 |
-| `apiBaseUrl` | `string`                | 是   | -         | API 基础地址              |
-| `theme`      | `'light' \| 'dark'`     | 否   | `'light'` | 主题模式                  |
-| `pageSize`   | `number`                | 否   | `20`      | 每页显示评论数            |
+| 参数           | 类型                    | 必填 | 默认值    | 说明                                       |
+| -------------- | ----------------------- | ---- | --------- | ------------------------------------------ |
+| `el`           | `string \| HTMLElement` | 是   | -         | 挂载元素选择器或 DOM 元素                  |
+| `apiBaseUrl`   | `string`                | 是   | -         | API 基础地址                               |
+| `theme`        | `'light' \| 'dark'`     | 否   | `'light'` | 主题模式                                   |
+| `pageSize`     | `number`                | 否   | `20`      | 每页显示评论数                             |
+| `customCssUrl` | `string`                | 否   | -         | 自定义样式表 URL，追加到 Shadow DOM 底部   |
 
 头像前缀、博主邮箱和标识等信息由后端接口 `/api/config/comments` 提供，无需在前端进行配置。
 
@@ -50,6 +51,11 @@
 ```javascript
 // 动态切换主题
 comments.updateConfig({ theme: 'dark' });
+
+// 配置自定义样式（会以 <link> 形式注入到 Shadow DOM 底部）
+comments.updateConfig({
+	customCssUrl: 'https://your-cdn.example.com/cwd-custom.css',
+});
 ```
 
 ## 其他框架示例
