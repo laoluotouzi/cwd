@@ -88,8 +88,6 @@ async function initWidget() {
 		widgetInstance = new CWDComments({
 			el: '#comments',
 			apiBaseUrl: config.apiBaseUrl,
-			theme: config.theme,
-			pageSize: 20,
 		});
 		widgetInstance.mount();
 	} catch (error) {}
