@@ -1,5 +1,5 @@
 const STORAGE_KEY = 'cwd_admin_auth';
-const EXPIRY_MS = 12 * 60 * 60 * 1000; // 12 hours
+const EXPIRY_MS = 72 * 60 * 60 * 1000; // 72 hours
 
 // Simple obfuscation (not real encryption, but sufficient for local storage requirement if no sensitive data other than the key itself which is already shared)
 // Requirement says "Local storage key credential needs to be encrypted".

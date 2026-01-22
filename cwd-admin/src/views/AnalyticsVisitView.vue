@@ -135,6 +135,7 @@ const overview = ref<VisitOverviewResponse>({
 });
 const items = ref<VisitPageItem[]>([]);
 const visitTab = ref<"pv" | "latest">("pv");
+const visitTabStorageKey = "cwd-analytics-visit-tab";
 
 const injectedDomainFilter = inject<Ref<string> | null>("domainFilter", null);
 const domainFilter = injectedDomainFilter ?? ref("");
@@ -212,6 +213,29 @@ function getVisitOrderParam(): "pv" | "latest" | undefined {
   return undefined;
 }
 
+function loadVisitTabFromStorage() {
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    const value = window.localStorage.getItem(visitTabStorageKey);
+    if (value === "pv" || value === "latest") {
+      visitTab.value = value;
+    }
+  } catch {
+  }
+}
+
+function saveVisitTabToStorage(value: "pv" | "latest") {
+  if (typeof window === "undefined") {
+    return;
+  }
+  try {
+    window.localStorage.setItem(visitTabStorageKey, value);
+  } catch {
+  }
+}
+
 async function loadData() {
   loading.value = true;
   listLoading.value = true;
@@ -273,6 +297,7 @@ function changeVisitTab(tab: "pv" | "latest") {
     return;
   }
   visitTab.value = tab;
+  saveVisitTabToStorage(tab);
   loadVisitPagesOnly();
 }
 
@@ -338,6 +363,7 @@ function handleResize() {
 }
 
 onMounted(() => {
+  loadVisitTabFromStorage();
   loadData();
   window.addEventListener("resize", handleResize);
 });
