@@ -33,7 +33,6 @@ export default defineConfig({
 			{ icon: 'github', link: 'https://github.com/anghunk/cwd' },
 			{ icon: 'discord', link: 'https://discord.gg/VahC3r7t' },
 		],
-
 		lastUpdated: true,
 		lastUpdatedText: '最后更新于',
 		footer: {
