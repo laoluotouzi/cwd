@@ -395,6 +395,7 @@
   line-height: 1.6;
   color: var(--cwd-text, #24292f);
   word-wrap: break-word;
+  white-space: pre-wrap;
   margin-top: 10px;
 }
 
@@ -573,9 +574,11 @@
   0% {
     transform: scale(1);
   }
+
   50% {
     transform: scale(1.2);
   }
+
   100% {
     transform: scale(1.05);
   }

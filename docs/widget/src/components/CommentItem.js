@@ -197,10 +197,10 @@ export class CommentItem extends Component {
       ]
     });
 
-    // 设置评论内容的 HTML
+    // 设置评论内容的 TEXT
     const contentEl = root.querySelector('.cwd-comment-content');
     if (contentEl) {
-      contentEl.innerHTML = comment.contentHtml;
+      contentEl.innerHTML = comment.contentText;
     }
 
     // 创建回复编辑器
@@ -343,7 +343,7 @@ export class CommentItem extends Component {
 
     const commentId = String(this.props.comment.id);
 
-    // 防抖检查：1秒内同一评论只能操作一次
+    // 防抖检查：1 秒内同一评论只能操作一次
     const now = Date.now();
     const debounceKey = `${this.getUserId()}_${commentId}`;
     const lastClick = CommentItem._likeDebounce.get(debounceKey);
@@ -424,7 +424,7 @@ export class CommentItem extends Component {
 
   /**
    * 检查是否已点赞
-   * @param {string|number} commentId - 评论ID
+   * @param {string|number} commentId - 评论 ID
    * @returns {boolean} 是否已点赞
    */
   hasLiked(commentId) {
