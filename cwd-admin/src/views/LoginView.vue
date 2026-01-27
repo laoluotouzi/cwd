@@ -88,15 +88,16 @@ async function handleSubmit() {
   justify-content: center;
   min-height: 100vh;
   padding: 24px 16px;
-  background: radial-gradient(circle at top, #eef2ff 0, #f9fafb 45%, #f3f4f6 100%);
+  background: var(--bg-body);
+  background: radial-gradient(circle at top, var(--bg-hover) 0, var(--bg-body) 100%);
 }
 
 .login-card {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   padding: 32px 32px 28px;
   border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  box-shadow: 0 18px 45px rgba(15, 23, 42, 0.12);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-login);
   width: 100%;
   max-width: 420px;
   box-sizing: border-box;
@@ -106,7 +107,7 @@ async function handleSubmit() {
   margin: 0;
   font-size: 24px;
   text-align: center;
-  color: #111827;
+  color: var(--text-primary);
   letter-spacing: 0.03em;
 }
 
@@ -114,7 +115,7 @@ async function handleSubmit() {
   margin: 8px 0 28px;
   font-size: 13px;
   text-align: center;
-  color: #6b7280;
+  color: var(--text-secondary);
 }
 
 .login-form {
@@ -131,28 +132,29 @@ async function handleSubmit() {
 
 .form-label {
   font-size: 14px;
-  color: #4b5563;
+  color: var(--text-secondary);
 }
 
 .form-input {
   padding: 9px 12px;
   border-radius: 8px;
-  border: 1px solid #d1d5db;
+  border: 1px solid var(--border-color);
   font-size: 14px;
   outline: none;
-  background-color: #f9fafb;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
   transition: border-color 0.16s ease, box-shadow 0.16s ease, background-color 0.16s ease;
 }
 
 .form-input:focus {
-  border-color: #2563eb;
-  background-color: #ffffff;
+  border-color: var(--primary-color);
+  background-color: var(--bg-input);
   box-shadow: 0 0 0 1px rgba(37, 99, 235, 0.18);
 }
 
 .form-error {
   font-size: 13px;
-  color: #dc2626;
+  color: var(--color-danger);
   margin-top: 4px;
 }
 
@@ -161,8 +163,8 @@ async function handleSubmit() {
   padding: 10px 0;
   border-radius: 999px;
   border: none;
-  background: linear-gradient(135deg, #2563eb, #1d4ed8);
-  color: #ffffff;
+  background: var(--primary-color);
+  color: var(--text-inverse);
   font-size: 15px;
   cursor: pointer;
   font-weight: 500;

@@ -31,8 +31,20 @@
           <a class="layout-button" href="https://github.com/anghunk/cwd" target="_blank">
             Github
           </a>
+           <button class="layout-button" @click="cycleTheme" :title="themeTitle" type="button">
+          <svg v-if="theme === 'light'" viewBox="0 0 24 24" width="16" height="16">
+            <path d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z" fill="currentColor"/>
+          </svg>
+          <svg v-else-if="theme === 'dark'" viewBox="0 0 24 24" width="16" height="16">
+            <path d="M20 12.986c-.52.095-1.056.15-1.6.15-5.238 0-9.486-4.248-9.486-9.486 0-.544.055-1.08.15-1.6-5.275.986-9.264 5.615-9.264 11.123 0 6.255 5.07 11.325 11.325 11.325 5.508 0 10.137-3.989 11.123-9.264a9.66 9.66 0 0 1-2.248.752z" fill="currentColor"/>
+          </svg>
+          <svg v-else viewBox="0 0 24 24" width="16" height="16">
+            <path d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6zM6 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H6zm-3 14a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1z" fill="currentColor"/>
+          </svg>
+        </button>
           <button class="layout-button" @click="handleLogout">退出</button>
         </div>
+       
         <button
           class="layout-actions-toggle"
           @click="toggleActions"
@@ -115,17 +127,31 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, watch, provide } from "vue";
+import { ref, onMounted, watch, provide, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { logoutAdmin, fetchDomainList } from "../api/admin";
+import { useTheme } from "../composables/useTheme";
 
 const DOMAIN_STORAGE_KEY = "cwd_admin_domain_filter";
 
 const router = useRouter();
 const route = useRoute();
+const { theme, setTheme } = useTheme();
 
 const isMobileSiderOpen = ref(false);
 const isActionsOpen = ref(false);
+
+const themeTitle = computed(() => {
+  if (theme.value === 'light') return '明亮模式';
+  if (theme.value === 'dark') return '暗黑模式';
+  return '跟随系统';
+});
+
+function cycleTheme() {
+  if (theme.value === 'system') setTheme('light');
+  else if (theme.value === 'light') setTheme('dark');
+  else setTheme('system');
+}
 
 const storedDomain =
   typeof window !== "undefined"
@@ -245,8 +271,9 @@ function handleLogoutFromActions() {
   align-items: center;
   justify-content: space-between;
   padding: 0 24px;
-  background-color: #24292f;
-  color: #ffffff;
+  background-color: var(--bg-header);
+  color: var(--text-inverse);
+  border-bottom: 1px solid var(--border-header);
 }
 
 .layout-title {
@@ -269,9 +296,9 @@ function handleLogoutFromActions() {
 .layout-domain-select {
   padding: 6px 8px;
   border-radius: 4px;
-  border: 1px solid #57606a;
-  background-color: #24292f;
-  color: #ffffff;
+  border: 1px solid var(--border-header);
+  background-color: var(--bg-select);
+  color: var(--text-inverse);
   font-size: 13px;
 }
 
@@ -284,15 +311,18 @@ function handleLogoutFromActions() {
   text-decoration: none;
   padding: 6px 10px;
   border-radius: 4px;
-  border: 1px solid #57606a;
-  background-color: #24292f;
-  color: #ffffff;
+  border: 1px solid var(--border-header);
+  background-color: var(--bg-select);
+  color: var(--text-inverse);
   cursor: pointer;
   font-size: 13px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .layout-button:hover {
-  background-color: #32383f;
+  background-color: var(--border-header);
 }
 
 .layout-actions-toggle {
@@ -301,9 +331,9 @@ function handleLogoutFromActions() {
   justify-content: center;
   padding: 6px;
   border-radius: 4px;
-  border: 1px solid #57606a;
-  background-color: #24292f;
-  color: #ffffff;
+  border: 1px solid var(--border-header);
+  background-color: var(--bg-select);
+  color: var(--text-inverse);
   cursor: pointer;
 }
 
@@ -319,8 +349,8 @@ function handleLogoutFromActions() {
 
 .layout-sider {
   width: 180px;
-  background-color: #f6f8fa;
-  border-right: 1px solid #d0d7de;
+  background-color: var(--bg-sider);
+  border-right: 1px solid var(--border-color);
 }
 
 .menu {
@@ -333,16 +363,17 @@ function handleLogoutFromActions() {
   padding: 10px 16px;
   cursor: pointer;
   font-size: 15px;
-  color: #24292f;
+  color: var(--text-primary);
 }
 
 .menu-item:hover {
-  background-color: #eaeef2;
+  background-color: var(--bg-hover);
 }
 
 .menu-item.active {
-  background-color: #d0ebff;
+  background-color: var(--bg-active);
   font-weight: 600;
+  color: var(--primary-color);
 }
 
 .layout-content {
@@ -357,9 +388,9 @@ function handleLogoutFromActions() {
   justify-content: center;
   padding: 6px 10px;
   border-radius: 4px;
-  border: 1px solid #57606a;
-  background-color: #24292f;
-  color: #ffffff;
+  border: 1px solid var(--border-header);
+  background-color: var(--bg-select);
+  color: var(--text-inverse);
   cursor: pointer;
   font-size: 13px;
 }
@@ -397,7 +428,7 @@ function handleLogoutFromActions() {
     bottom: 0;
     width: 220px;
     max-width: 80%;
-    border-right: 1px solid #d0d7de;
+    border-right: 1px solid var(--border-color);
     transform: translateX(-100%);
     transition: transform 0.2s ease-out;
     z-index: 1000;
@@ -434,10 +465,10 @@ function handleLogoutFromActions() {
     position: fixed;
     top: 56px;
     right: 12px;
-    background-color: #ffffff;
-    border: 1px solid #d0d7de;
+    background-color: var(--bg-card);
+    border: 1px solid var(--border-color);
     border-radius: 6px;
-    box-shadow: 0 8px 24px rgba(140, 149, 159, 0.3);
+    box-shadow: var(--shadow-card);
     padding: 6px 0;
     min-width: 160px;
     z-index: 1100;
@@ -452,20 +483,20 @@ function handleLogoutFromActions() {
     border: none;
     text-align: left;
     cursor: pointer;
-    color: #24292f;
+    color: var(--text-primary);
     width: 100%;
   }
 
   .layout-actions-item:hover {
-    background-color: #f6f8fa;
+    background-color: var(--bg-hover);
   }
 
   .layout-actions-item-danger {
-    color: #d1242f;
+    color: var(--color-danger);
   }
 
   .layout-actions-item-danger:hover {
-    background-color: #ffebe9;
+    background-color: rgba(209, 36, 47, 0.1);
   }
 }
 </style>

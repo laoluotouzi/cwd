@@ -668,13 +668,13 @@ onMounted(() => {
 .page-title {
   margin: 0;
   font-size: 18px;
-  color: #24292f;
+  color: var(--text-primary);
 }
 
 .card {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   border-radius: 6px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
   padding: 12px 18px;
   margin-bottom: 1em;
 }
@@ -693,11 +693,12 @@ onMounted(() => {
   margin: 0;
   font-size: 16px;
   font-weight: 600;
+  color: var(--text-primary);
 }
 
 .card-icon {
   font-size: 12px;
-  color: #57606a;
+  color: var(--text-secondary);
   transition: transform 0.2s ease;
 }
 
@@ -713,12 +714,12 @@ onMounted(() => {
   margin: 0 0 12px;
   font-size: 15px;
   font-weight: 600;
-  color: #24292f;
+  color: var(--text-primary);
 }
 
 .divider {
   height: 1px;
-  background-color: #d0d7de;
+  background-color: var(--border-color);
   margin: 16px 0;
 }
 
@@ -731,19 +732,21 @@ onMounted(() => {
 
 .form-label {
   font-size: 14px;
-  color: #555555;
+  color: var(--text-secondary);
 }
 
 .form-input {
   padding: 8px 10px;
   border-radius: 4px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
   font-size: 14px;
   outline: none;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .form-input:focus {
-  border-color: #0969da;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 1px rgba(9, 105, 218, 0.2);
 }
 
@@ -757,18 +760,18 @@ onMounted(() => {
   padding: 10px 14px;
   border-radius: 6px;
   font-size: 13px;
-  box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+  box-shadow: var(--shadow-card);
   z-index: 1000;
 }
 
 .toast-success {
-  background-color: #1a7f37;
-  color: #ffffff;
+  background-color: var(--color-success);
+  color: var(--text-inverse);
 }
 
 .toast-error {
-  background-color: #d1242f;
-  color: #ffffff;
+  background-color: var(--color-danger);
+  color: var(--text-inverse);
 }
 
 .switch {
@@ -792,7 +795,7 @@ onMounted(() => {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: #d0d7de;
+  background-color: var(--border-color);
   transition: 0.2s;
   border-radius: 999px;
 }
@@ -811,7 +814,7 @@ onMounted(() => {
 }
 
 .switch input:checked + .slider {
-  background-color: #0969da;
+  background-color: var(--primary-color);
 }
 
 .switch input:checked + .slider::before {
@@ -828,21 +831,21 @@ onMounted(() => {
   padding: 8px 14px;
   border-radius: 4px;
   border: none;
-  background-color: #0969da;
-  color: #ffffff;
+  background-color: var(--primary-color);
+  color: var(--text-inverse);
   font-size: 14px;
   cursor: pointer;
   min-width: 100px;
 }
 
 .card-button.secondary {
-  background-color: #f6f8fa;
-  color: #24292f;
-  border: 1px solid #d0d7de;
+  background-color: var(--bg-sider);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
 }
 .card-button.secondary:hover {
-  background-color: #f3f4f6;
-  border-color: #d0d7de;
+  background-color: var(--bg-hover);
+  border-color: var(--border-color);
 }
 
 .card-button:disabled {
@@ -856,11 +859,11 @@ onMounted(() => {
 }
 
 .form-message-success {
-  color: #1a7f37;
+  color: var(--color-success);
 }
 
 .form-message-error {
-  color: #d1242f;
+  color: var(--color-danger);
 }
 
 .loading-container {
@@ -875,15 +878,15 @@ onMounted(() => {
 .loading-spinner {
   width: 32px;
   height: 32px;
-  border: 3px solid #f0f0f0;
-  border-top-color: #0969da;
+  border: 3px solid var(--bg-hover);
+  border-top-color: var(--primary-color);
   border-radius: 50%;
   animation: spin 1s linear infinite;
 }
 
 .loading-text {
   font-size: 14px;
-  color: #57606a;
+  color: var(--text-secondary);
 }
 
 @keyframes spin {
@@ -896,16 +899,16 @@ onMounted(() => {
 }
 .page-hint {
   font-size: 14px;
-  color: #57606a;
+  color: var(--text-secondary);
 }
 .form-hint {
   font-size: 12px;
-  color: #57606a;
+  color: var(--text-secondary);
   margin-top: 4px;
   line-height: 1.5;
 }
 .form-hint a {
-  color: #0969da;
+  color: var(--primary-color);
   text-decoration: none;
 }
 .form-hint a:hover {

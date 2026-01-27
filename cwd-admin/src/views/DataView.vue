@@ -409,13 +409,13 @@ async function executeImport(comments: any[]) {
 .page-title {
   margin: 0;
   font-size: 18px;
-  color: #24292f;
+  color: var(--text-primary);
 }
 
 .card {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   border-radius: 6px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
   padding: 16px 18px;
   margin-bottom: 1em;
 }
@@ -423,6 +423,7 @@ async function executeImport(comments: any[]) {
 .card-title {
   margin: 0 0 12px;
   font-size: 15px;
+  color: var(--text-primary);
 }
 
 .stats-grid {
@@ -434,55 +435,56 @@ async function executeImport(comments: any[]) {
 .stats-item {
   padding: 10px 12px;
   border-radius: 6px;
-  background-color: #f6f8fa;
-  border: 1px solid #d0d7de;
+  background-color: var(--bg-sider);
+  border: 1px solid var(--border-color);
 }
 
 .stats-label {
   font-size: 12px;
-  color: #57606a;
+  color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
 .stats-value {
   font-size: 18px;
   font-weight: 600;
-  color: #24292f;
+  color: var(--text-primary);
 }
 
 .stats-value-approved {
-  color: #1a7f37;
+  color: var(--color-success);
 }
 
 .stats-value-pending {
-  color: #9a6700;
+  color: var(--color-warning);
 }
 
 .stats-value-rejected {
-  color: #d1242f;
+  color: var(--color-danger);
 }
 
 .domain-table {
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   overflow: hidden;
 }
 
 .domain-table-header {
   display: flex;
-  background-color: #f6f8fa;
+  background-color: var(--bg-sider);
+  color: var(--text-secondary);
 }
 
 .domain-table-row {
   display: flex;
-  border-top: 1px solid #eaeae0;
+  border-top: 1px solid var(--border-color);
 }
 
 .domain-cell {
   flex: 1;
   padding: 8px 10px;
   font-size: 13px;
-  color: #24292f;
+  color: var(--text-primary);
   box-sizing: border-box;
 }
 
@@ -493,7 +495,7 @@ async function executeImport(comments: any[]) {
 
 .card-desc {
   font-size: 14px;
-  color: #57606a;
+  color: var(--text-secondary);
   margin: 0 0 16px;
 }
 
@@ -506,8 +508,8 @@ async function executeImport(comments: any[]) {
   padding: 8px 14px;
   border-radius: 4px;
   border: none;
-  background-color: #0969da;
-  color: #ffffff;
+  background-color: var(--primary-color);
+  color: var(--text-inverse);
   font-size: 14px;
   cursor: pointer;
   min-width: 100px;
@@ -527,22 +529,22 @@ async function executeImport(comments: any[]) {
 
 .form-label {
   font-size: 14px;
-  color: #24292f;
+  color: var(--text-primary);
   font-weight: 500;
 }
 
 .form-select {
   padding: 6px 8px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
   font-size: 14px;
-  color: #24292f;
-  background-color: #f6f8fa;
+  color: var(--text-primary);
+  background-color: var(--bg-input);
   outline: none;
 }
 
 .form-select:focus {
-  border-color: #0969da;
+  border-color: var(--primary-color);
   box-shadow: 0 0 0 2px rgba(9, 105, 218, 0.3);
 }
 
@@ -556,32 +558,32 @@ async function executeImport(comments: any[]) {
   padding: 10px 14px;
   border-radius: 6px;
   font-size: 13px;
-  box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+  box-shadow: var(--shadow-card);
   z-index: 1000;
 }
 
 .toast-success {
-  background-color: #1a7f37;
-  color: #ffffff;
+  background-color: var(--color-success);
+  color: var(--text-inverse);
 }
 
 .toast-error {
-  background-color: #d1242f;
-  color: #ffffff;
+  background-color: var(--color-danger);
+  color: var(--text-inverse);
 }
 
 .log-container {
   margin-top: 16px;
   padding: 12px;
-  background-color: #f6f8fa;
+  background-color: var(--bg-sider);
   border-radius: 6px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
 }
 
 .log-title {
   font-size: 13px;
   font-weight: 600;
-  color: #24292f;
+  color: var(--text-primary);
   margin-bottom: 8px;
 }
 
@@ -597,7 +599,7 @@ async function executeImport(comments: any[]) {
   font-size: 12px;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono",
     monospace;
-  color: #57606a;
+  color: var(--text-secondary);
   line-height: 1.5;
 }
 </style>

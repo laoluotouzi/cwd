@@ -272,7 +272,7 @@ onBeforeUnmount(() => {
 .page-title {
   margin: 0;
   font-size: 18px;
-  color: #24292f;
+  color: var(--text-primary);
 }
 
 .toolbar {
@@ -292,21 +292,23 @@ onBeforeUnmount(() => {
   padding: 8px 8px;
   box-sizing: border-box;
   font-size: 13px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
   border-radius: 4px;
-  background-color: #ffffff;
+  background-color: var(--bg-input);
+  color: var(--text-primary);
 }
 
 .card {
-  background-color: #ffffff;
+  background-color: var(--bg-card);
   border-radius: 6px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
   padding: 16px 18px;
 }
 
 .card-title {
   margin: 0 0 12px;
   font-size: 16px;
+  color: var(--text-primary);
 }
 
 .card-title-row {
@@ -319,18 +321,18 @@ onBeforeUnmount(() => {
 
 .page-hint {
   font-size: 14px;
-  color: #57606a;
+  color: var(--text-secondary);
 }
 
 .page-error {
   font-size: 14px;
-  color: #d1242f;
+  color: var(--color-danger);
 }
 
 .chart-tabs {
   display: inline-flex;
   border-radius: 999px;
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
   overflow: hidden;
 }
 
@@ -338,18 +340,18 @@ onBeforeUnmount(() => {
   padding: 4px 10px;
   font-size: 12px;
   border: none;
-  background-color: #ffffff;
-  color: #57606a;
+  background-color: var(--bg-card);
+  color: var(--text-secondary);
   cursor: pointer;
 }
 
 .chart-tab + .chart-tab {
-  border-left: 1px solid #d0d7de;
+  border-left: 1px solid var(--border-color);
 }
 
 .chart-tab-active {
-  background-color: #0969da;
-  color: #ffffff;
+  background-color: var(--primary-color);
+  color: var(--text-inverse);
 }
 
 .stats-grid {
@@ -361,32 +363,32 @@ onBeforeUnmount(() => {
 .stats-item {
   padding: 10px 12px;
   border-radius: 6px;
-  background-color: #f6f8fa;
-  border: 1px solid #d0d7de;
+  background-color: var(--bg-sider);
+  border: 1px solid var(--border-color);
 }
 
 .stats-label {
   font-size: 14px;
-  color: #57606a;
+  color: var(--text-secondary);
   margin-bottom: 4px;
 }
 
 .stats-value {
   font-size: 30px;
   font-weight: 600;
-  color: #24292f;
+  color: var(--text-primary);
 }
 
 .stats-value-approved {
-  color: #1a7f37;
+  color: var(--color-success);
 }
 
 .stats-value-pending {
-  color: #9a6700;
+  color: var(--color-warning);
 }
 
 .stats-value-rejected {
-  color: #d1242f;
+  color: var(--color-danger);
 }
 
 .domain-table-wrapper {
@@ -396,7 +398,7 @@ onBeforeUnmount(() => {
 }
 
 .domain-table {
-  border: 1px solid #d0d7de;
+  border: 1px solid var(--border-color);
   border-radius: 6px;
   min-width: 520px;
   overflow: hidden;
@@ -404,19 +406,20 @@ onBeforeUnmount(() => {
 
 .domain-table-header {
   display: flex;
-  background-color: #f6f8fa;
+  background-color: var(--bg-sider);
+  color: var(--text-secondary);
 }
 
 .domain-table-row {
   display: flex;
-  border-top: 1px solid #eaeae0;
+  border-top: 1px solid var(--border-color);
 }
 
 .domain-cell {
   flex: 1;
   padding: 10px 10px;
   font-size: 14px;
-  color: #24292f;
+  color: var(--text-primary);
   box-sizing: border-box;
 }
 
@@ -444,18 +447,18 @@ onBeforeUnmount(() => {
   padding: 10px 14px;
   border-radius: 6px;
   font-size: 13px;
-  box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+  box-shadow: var(--shadow-card);
   z-index: 1000;
 }
 
 .toast-success {
-  background-color: #1a7f37;
-  color: #ffffff;
+  background-color: var(--color-success);
+  color: var(--text-inverse);
 }
 
 .toast-error {
-  background-color: #d1242f;
-  color: #ffffff;
+  background-color: var(--color-danger);
+  color: var(--text-inverse);
 }
 
 @media (max-width: 768px) {
