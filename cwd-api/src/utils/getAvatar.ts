@@ -29,7 +29,7 @@ export const getCravatar = async (
 	const identifier = pickIdentifier(email) || pickIdentifier(name);
 
 	if (!identifier) {
-		return `${avatarPrefix}/${DEFAULT_AVATAR_HASH}?s=200&d=retro`;
+		return `${avatarPrefix}/${DEFAULT_AVATAR_HASH}?s=120&d=retro`;
 	}
 
 	const msgUint8 = new TextEncoder().encode(identifier);
@@ -37,5 +37,5 @@ export const getCravatar = async (
 	const hashArray = Array.from(new Uint8Array(hashBuffer));
 	const hashHex = hashArray.map((b) => b.toString(16).padStart(2, '0')).join('');
 
-	return `${avatarPrefix}/${hashHex}?s=200&d=retro`;
+	return `${avatarPrefix}/${hashHex}?s=120&d=retro`;
 };
