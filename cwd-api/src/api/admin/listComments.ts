@@ -65,7 +65,7 @@ export const listComments = async (c: Context<{ Bindings: Bindings }>) => {
 					? row.likes
 					: 0,
 			ua: row.ua,
-			avatar: await getCravatar(row.email, avatarPrefix || undefined),
+			avatar: await getCravatar(row.email, row.name, avatarPrefix || undefined),
 			isAdmin: adminEmail && row.email === adminEmail
 		}))
 	);

@@ -69,7 +69,7 @@ export const getComments = async (c: Context<{ Bindings: Bindings }>) => {
     // 2. 批量处理头像并格式化
     const allComments = await Promise.all(results.map(async (row: any) => ({
       ...row,
-      avatar: await getCravatar(row.email, avatar_prefix || undefined),
+      avatar: await getCravatar(row.email, row.name, avatar_prefix || undefined),
       isAdmin: adminEmail && row.email === adminEmail,
       replies: []
     })))
