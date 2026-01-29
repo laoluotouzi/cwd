@@ -11,7 +11,7 @@ const routes: RouteRecordRaw[] = [
 	{
 		path: '/login',
 		name: 'login',
-		component: LoginView
+		component: LoginView,
 	},
 	{
 		path: '/',
@@ -19,43 +19,64 @@ const routes: RouteRecordRaw[] = [
 		children: [
 			{
 				path: '',
-				redirect: '/comments'
+				redirect: '/comments',
 			},
 			{
 				path: 'comments',
 				name: 'comments',
-				component: CommentsView
+				component: CommentsView,
+				meta: {
+					title: '评论管理',
+				},
 			},
 			{
 				path: 'stats',
 				name: 'stats',
-				component: StatsView
+				component: StatsView,
+				meta: {
+					title: '数据看板',
+				},
 			},
 			{
 				path: 'analytics',
 				name: 'analytics',
-				component: AnalyticsVisitView
+				component: AnalyticsVisitView,
+				meta: {
+					title: '访问统计',
+				},
 			},
 			{
 				path: 'settings',
 				name: 'settings',
-				component: SettingsView
+				component: SettingsView,
+				meta: {
+					title: '网站设置',
+				},
 			},
 			{
 				path: 'data',
 				name: 'data',
-				component: DataView
-			}
-		]
-	}
+				component: DataView,
+				meta: {
+					title: '数据迁移',
+				},
+			},
+		],
+	},
 ];
 
 export const router = createRouter({
 	history: createWebHistory(),
-	routes
+	routes,
 });
 
 router.beforeEach((to, from, next) => {
+	const defaultTitle = 'CWD 评论系统';
+	if (to.meta && to.meta.title) {
+		document.title = (to.meta.title + ' - ' + defaultTitle) as string;
+	} else {
+		document.title = defaultTitle as string;
+	}
 	if (to.name === 'login') {
 		next();
 		return;
@@ -66,4 +87,14 @@ router.beforeEach((to, from, next) => {
 		return;
 	}
 	next();
+});
+
+router.afterEach((to, from) => {
+	if (to.name !== from.name) {
+		const layoutContent = document.querySelector('.layout-content');
+		if (layoutContent instanceof HTMLElement) {
+			layoutContent.scrollTop = 0;
+		}
+		window.scrollTo(0, 0);
+	}
 });

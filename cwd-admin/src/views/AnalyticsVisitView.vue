@@ -175,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, onBeforeUnmount, ref, nextTick, watch, inject } from "vue";
+import { onMounted, onBeforeUnmount, ref, nextTick, watch, inject, computed } from "vue";
 import type { Ref } from "vue";
 import * as echarts from "echarts";
 import {
@@ -199,7 +199,25 @@ const overview = ref<VisitOverviewResponse>({
   last30Days: [],
 });
 
-const items = ref<VisitPageItem[]>([]);
+const rawItems = ref<VisitPageItem[]>([]);
+const items = computed<VisitPageItem[]>(() => {
+  const list = rawItems.value.slice();
+  list.sort((a, b) => {
+    const aLast = getLastVisitAtTs(a.lastVisitAt);
+    const bLast = getLastVisitAtTs(b.lastVisitAt);
+    if (visitTab.value === "latest") {
+      if (bLast !== aLast) {
+        return bLast - aLast;
+      }
+      return b.pv - a.pv;
+    }
+    if (b.pv !== a.pv) {
+      return b.pv - a.pv;
+    }
+    return bLast - aLast;
+  });
+  return list;
+});
 const visitTab = ref<"pv" | "latest">("pv");
 const visitTabStorageKey = "cwd-analytics-visit-tab";
 const chartRangeStorageKey = "cwd-analytics-visit-chart-range";
@@ -332,6 +350,16 @@ function loadChartRangeFromStorage() {
   }
 }
 
+function getLastVisitAtTs(value: number | null | undefined): number {
+  if (!value) {
+    return 0;
+  }
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return 0;
+  }
+  return value;
+}
+
 function saveChartRangeToStorage(value: "7" | "30") {
   if (typeof window === "undefined") {
     return;
@@ -367,7 +395,7 @@ async function loadData() {
     const likeItemsRaw = Array.isArray(likeStatsRes.items) ? likeStatsRes.items : [];
     likeStatsItems.value = filterLikeStatsByDomain(likeItemsRaw, domain);
     const pageItems = Array.isArray(pagesRes.items) ? pagesRes.items : [];
-    items.value = pageItems;
+    rawItems.value = pageItems;
     last30Days.value = Array.isArray(overviewRes.last30Days)
       ? overviewRes.last30Days
       : [];
@@ -385,31 +413,12 @@ async function loadData() {
   }
 }
 
-async function loadVisitPagesOnly() {
-  listLoading.value = true;
-  error.value = "";
-  try {
-    const domain = domainFilter.value || undefined;
-    const order = getVisitOrderParam();
-    const pagesRes = await fetchVisitPages(domain, order);
-    const pageItems = Array.isArray(pagesRes.items) ? pagesRes.items : [];
-    items.value = pageItems;
-  } catch (e: any) {
-    const msg = e.message || "加载访问统计数据失败";
-    error.value = msg;
-    showToast(msg, "error");
-  } finally {
-    listLoading.value = false;
-  }
-}
-
 function changeVisitTab(tab: "pv" | "latest") {
   if (visitTab.value === tab) {
     return;
   }
   visitTab.value = tab;
   saveVisitTabToStorage(tab);
-  loadVisitPagesOnly();
 }
 
 function renderChart() {
