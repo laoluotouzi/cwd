@@ -31,7 +31,7 @@ export const updateFeatureSettings = async (c: Context<{ Bindings: Bindings }>) 
 			enableArticleLike
 		});
 
-		return c.json({ message: 'Saved successfully' });
+		return c.json({ message: '保存成功！' });
 	} catch (e: any) {
 		return c.json({ message: e.message || 'Failed to save feature settings' }, 500);
 	}

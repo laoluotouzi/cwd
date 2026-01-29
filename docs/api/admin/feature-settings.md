@@ -73,7 +73,7 @@ PUT /admin/settings/feature
 
 ```json
 {
-  "message": "Saved successfully"
+  "message": "保存成功！"
 }
 ```
 
