@@ -7,12 +7,7 @@
         aria-label="切换菜单"
         type="button"
       >
-        <svg class="layout-menu-icon" viewBox="0 0 24 24" width="18" height="18">
-          <path
-            d="M4 7h16a1 1 0 0 0 0-2H4a1 1 0 0 0 0 2zm0 6h16a1 1 0 0 0 0-2H4a1 1 0 0 0 0 2zm0 6h16a1 1 0 0 0 0-2H4a1 1 0 0 0 0 2z"
-            fill="currentColor"
-          />
-        </svg>
+        <PhTextIndent :size="20" />
       </button>
       <div class="layout-title">CWD 评论系统</div>
       <div class="layout-actions-wrapper">
@@ -37,24 +32,9 @@
             :title="themeTitle"
             type="button"
           >
-            <svg v-if="theme === 'light'" viewBox="0 0 24 24" width="16" height="16">
-              <path
-                d="M12 18a6 6 0 1 0 0-12 6 6 0 0 0 0 12zM11 1h2v3h-2V1zm0 19h2v3h-2v-3zM3.515 4.929l1.414-1.414L7.05 5.636 5.636 7.05 3.515 4.93zM16.95 18.364l1.414-1.414 2.121 2.121-1.414 1.414-2.121-2.121zm2.121-14.85l1.414 1.415-2.121 2.121-1.414-1.414 2.121-2.121zM5.636 16.95l1.414 1.414-2.121 2.121-1.414-1.414 2.121-2.121zM23 11v2h-3v-2h3zM4 11v2H1v-2h3z"
-                fill="currentColor"
-              />
-            </svg>
-            <svg v-else-if="theme === 'dark'" viewBox="0 0 24 24" width="16" height="16">
-              <path
-                d="M20 12.986c-.52.095-1.056.15-1.6.15-5.238 0-9.486-4.248-9.486-9.486 0-.544.055-1.08.15-1.6-5.275.986-9.264 5.615-9.264 11.123 0 6.255 5.07 11.325 11.325 11.325 5.508 0 10.137-3.989 11.123-9.264a9.66 9.66 0 0 1-2.248.752z"
-                fill="currentColor"
-              />
-            </svg>
-            <svg v-else viewBox="0 0 24 24" width="16" height="16">
-              <path
-                d="M4 6a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6zM6 5a1 1 0 0 0-1 1v8a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V6a1 1 0 0 0-1-1H6zm-3 14a1 1 0 0 1 1-1h16a1 1 0 0 1 1 1v1a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1v-1z"
-                fill="currentColor"
-              />
-            </svg>
+            <PhSun v-if="theme === 'light'" :size="16" />
+            <PhMoon v-else-if="theme === 'dark'" :size="16" />
+            <PhAirplay v-else :size="16" />
           </button>
           <button class="layout-button" @click="handleLogout">退出</button>
         </div>
@@ -65,12 +45,7 @@
           aria-label="更多操作"
           type="button"
         >
-          <svg class="layout-actions-icon" viewBox="0 0 24 24" width="18" height="18">
-            <path
-              d="M12 5.5a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5zm0 8a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5zm0 8a1.75 1.75 0 1 1 0-3.5 1.75 1.75 0 0 1 0 3.5z"
-              fill="currentColor"
-            />
-          </svg>
+          <PhDotsThreeVertical :size="20" bold />
         </button>
         <div v-if="isActionsOpen" class="layout-actions-dropdown">
           <button class="layout-actions-item" type="button" @click="openDocs">
