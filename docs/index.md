@@ -9,11 +9,8 @@ hero:
     alt: 文档封面
   actions:
     - theme: brand
-      text: 快速开始
+      text: 开始使用
       link: /guide/getting-started
-    - theme: alt
-      text: API 文档
-      link: /api/overview
     - theme: alt
       text: Github
       link: https://github.com/anghunk/cwd

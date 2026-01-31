@@ -170,7 +170,7 @@ import { ref, onMounted, watch, provide, computed } from "vue";
 import { useRouter, useRoute } from "vue-router";
 import { logoutAdmin, fetchDomainList } from "../../api/admin";
 import { useTheme } from "../../composables/useTheme";
-import packageJson from "../../../../package.json";
+import packageJson from "../../../package.json";
 
 const DOMAIN_STORAGE_KEY = "cwd_admin_domain_filter";
 const API_BASE_URL_KEY = "cwd_admin_api_base_url";
