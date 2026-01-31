@@ -1,12 +1,19 @@
 {
-  "name": "widget",
-  "version": "0.0.0",
+  "name": "cwd-widget",
+  "version": "0.0.1",
+  "description": "Server-free, extremely fast and secure, plug-and-play commenting system based on Cloudflare Workers and the Global Edge Network.",
   "type": "module",
+  "author": "anghunk",
+  "license": "Apache-2.0",
   "scripts": {
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
+  "keywords": [
+    "cloudflare workers",
+    "Comment"
+  ],
   "devDependencies": {
     "terser": "^5.44.1",
     "vite": "^6.0.11",
