@@ -60,36 +60,90 @@
             </div>
             <div class="form-item">
               <label class="form-label">
-                允许调用的域名（多个域名用逗号分隔，留空则不限制。设置后仅匹配域名可调用前台评论组件。）
+                允许调用的域名（设置后仅匹配域名可调用前台评论组件，留空则不限制。使用空格或者逗号进行分割。）
               </label>
-              <textarea
-                v-model="allowedDomains"
-                class="form-input"
-                rows="3"
-                placeholder="例如: example.com, test.com"
-              ></textarea>
+              <div class="tag-input">
+                <div class="tag-input-inner">
+                  <span
+                    v-for="domain in allowedDomainTags"
+                    :key="domain"
+                    class="tag-input-tag"
+                  >
+                    <span class="tag-input-tag-text">{{ domain }}</span>
+                    <button
+                      type="button"
+                      class="tag-input-tag-remove"
+                      @click="removeAllowedDomain(domain)"
+                    >
+                      <PhTrash :size="14" />
+                    </button>
+                  </span>
+                  <input
+                    v-model="allowedDomainInput"
+                    class="tag-input-input"
+                    @keyup="handleAllowedDomainKeyup"
+                    @blur="handleAllowedDomainBlur"
+                  />
+                </div>
+              </div>
             </div>
             <div class="form-item">
               <label class="form-label">
                 IP 黑名单（多个 IP 用逗号或换行分隔，留空则不限制）
               </label>
-              <textarea
-                v-model="blockedIps"
-                class="form-input"
-                rows="3"
-                placeholder="例如: 1.1.1.1, 2.2.2.2"
-              ></textarea>
+              <div class="tag-input">
+                <div class="tag-input-inner">
+                  <span
+                    v-for="ip in blockedIpTags"
+                    :key="ip"
+                    class="tag-input-tag"
+                  >
+                    <span class="tag-input-tag-text">{{ ip }}</span>
+                    <button
+                      type="button"
+                      class="tag-input-tag-remove"
+                      @click="removeBlockedIp(ip)"
+                    >
+                      <PhTrash :size="14" />
+                    </button>
+                  </span>
+                  <input
+                    v-model="blockedIpInput"
+                    class="tag-input-input"
+                    @keyup="handleBlockedIpKeyup"
+                    @blur="handleBlockedIpBlur"
+                  />
+                </div>
+              </div>
             </div>
             <div class="form-item">
               <label class="form-label"
                 >邮箱黑名单（多个邮箱用逗号或换行分隔，留空则不限制）</label
               >
-              <textarea
-                v-model="blockedEmails"
-                class="form-input"
-                rows="3"
-                placeholder="例如: spam@example.com, bot@test.com"
-              ></textarea>
+              <div class="tag-input">
+                <div class="tag-input-inner">
+                  <span
+                    v-for="email in blockedEmailTags"
+                    :key="email"
+                    class="tag-input-tag"
+                  >
+                    <span class="tag-input-tag-text">{{ email }}</span>
+                    <button
+                      type="button"
+                      class="tag-input-tag-remove"
+                      @click="removeBlockedEmail(email)"
+                    >
+                      <PhTrash :size="14" />
+                    </button>
+                  </span>
+                  <input
+                    v-model="blockedEmailInput"
+                    class="tag-input-input"
+                    @keyup="handleBlockedEmailKeyup"
+                    @blur="handleBlockedEmailBlur"
+                  />
+                </div>
+              </div>
             </div>
 
             <div class="card-actions">
@@ -361,7 +415,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, type Ref } from "vue";
 import {
   fetchCommentSettings,
   saveCommentSettings,
@@ -456,9 +510,12 @@ const commentAdminEmail = ref("");
 const commentAdminBadge = ref("");
 const avatarPrefix = ref("");
 const commentAdminEnabled = ref(false);
-const allowedDomains = ref("");
-const blockedIps = ref("");
-const blockedEmails = ref("");
+const allowedDomainTags = ref<string[]>([]);
+const allowedDomainInput = ref("");
+const blockedIpTags = ref<string[]>([]);
+const blockedIpInput = ref("");
+const blockedEmailTags = ref<string[]>([]);
+const blockedEmailInput = ref("");
 const commentAdminKey = ref("");
 const adminKeySet = ref(false);
 const requireReview = ref(false);
@@ -470,6 +527,135 @@ const telegramNotifyEnabled = ref(false);
 const savingTelegram = ref(false);
 const settingUpWebhook = ref(false);
 const testingTelegram = ref(false);
+
+function addAllowedDomainsFromInput() {
+  const raw = allowedDomainInput.value;
+  if (!raw) {
+    return;
+  }
+  const parts = raw
+    .split(/[,，\s]+/)
+    .map((d) => d.trim())
+    .filter(Boolean);
+  if (parts.length === 0) {
+    allowedDomainInput.value = "";
+    return;
+  }
+  const existing = new Set(allowedDomainTags.value);
+  for (const part of parts) {
+    if (!existing.has(part)) {
+      allowedDomainTags.value.push(part);
+      existing.add(part);
+    }
+  }
+  allowedDomainInput.value = "";
+}
+
+function handleAllowedDomainKeyup(event: KeyboardEvent) {
+  if (
+    event.key === " " ||
+    event.key === "Spacebar" ||
+    event.key === "," ||
+    event.key === "，" ||
+    event.key === "Enter"
+  ) {
+    addAllowedDomainsFromInput();
+  }
+}
+
+function handleAllowedDomainBlur() {
+  addAllowedDomainsFromInput();
+}
+
+function removeAllowedDomain(domain: string) {
+  allowedDomainTags.value = allowedDomainTags.value.filter((d) => d !== domain);
+}
+
+function addBlockedIpFromInput() {
+  const raw = blockedIpInput.value;
+  if (!raw) {
+    return;
+  }
+  const parts = raw
+    .split(/[,，\s]+/)
+    .map((d) => d.trim())
+    .filter(Boolean);
+  if (parts.length === 0) {
+    blockedIpInput.value = "";
+    return;
+  }
+  const existing = new Set(blockedIpTags.value);
+  for (const part of parts) {
+    if (!existing.has(part)) {
+      blockedIpTags.value.push(part);
+      existing.add(part);
+    }
+  }
+  blockedIpInput.value = "";
+}
+
+function handleBlockedIpKeyup(event: KeyboardEvent) {
+  if (
+    event.key === " " ||
+    event.key === "Spacebar" ||
+    event.key === "," ||
+    event.key === "，" ||
+    event.key === "Enter"
+  ) {
+    addBlockedIpFromInput();
+  }
+}
+
+function handleBlockedIpBlur() {
+  addBlockedIpFromInput();
+}
+
+function removeBlockedIp(ip: string) {
+  blockedIpTags.value = blockedIpTags.value.filter((t) => t !== ip);
+}
+
+function addBlockedEmailFromInput() {
+  const raw = blockedEmailInput.value;
+  if (!raw) {
+    return;
+  }
+  const parts = raw
+    .split(/[,，\s]+/)
+    .map((d) => d.trim())
+    .filter(Boolean);
+  if (parts.length === 0) {
+    blockedEmailInput.value = "";
+    return;
+  }
+  const existing = new Set(blockedEmailTags.value);
+  for (const part of parts) {
+    if (!existing.has(part)) {
+      blockedEmailTags.value.push(part);
+      existing.add(part);
+    }
+  }
+  blockedEmailInput.value = "";
+}
+
+function handleBlockedEmailKeyup(event: KeyboardEvent) {
+  if (
+    event.key === " " ||
+    event.key === "Spacebar" ||
+    event.key === "," ||
+    event.key === "，" ||
+    event.key === "Enter"
+  ) {
+    addBlockedEmailFromInput();
+  }
+}
+
+function handleBlockedEmailBlur() {
+  addBlockedEmailFromInput();
+}
+
+function removeBlockedEmail(email: string) {
+  blockedEmailTags.value = blockedEmailTags.value.filter((t) => t !== email);
+}
 
 const savingEmail = ref(false);
 const testingEmail = ref(false);
@@ -555,13 +741,21 @@ async function load() {
     commentAdminBadge.value = commentRes.adminBadge ?? "";
     avatarPrefix.value = commentRes.avatarPrefix || "";
     commentAdminEnabled.value = !!commentRes.adminEnabled;
-    allowedDomains.value = commentRes.allowedDomains
-      ? commentRes.allowedDomains.join(", ")
-      : "";
-    blockedIps.value = commentRes.blockedIps ? commentRes.blockedIps.join(", ") : "";
-    blockedEmails.value = commentRes.blockedEmails
-      ? commentRes.blockedEmails.join(", ")
-      : "";
+    const domains = Array.isArray(commentRes.allowedDomains)
+      ? commentRes.allowedDomains
+      : [];
+    allowedDomainTags.value = domains
+      .map((d: string) => String(d).trim())
+      .filter(Boolean);
+    allowedDomainInput.value = "";
+    blockedIpTags.value = Array.isArray(commentRes.blockedIps)
+      ? commentRes.blockedIps
+      : [];
+    blockedIpInput.value = "";
+    blockedEmailTags.value = Array.isArray(commentRes.blockedEmails)
+      ? commentRes.blockedEmails
+      : [];
+    blockedEmailInput.value = "";
     commentAdminKey.value = commentRes.adminKey || "";
     adminKeySet.value = !!commentRes.adminKeySet;
     requireReview.value = !!commentRes.requireReview;
@@ -686,20 +880,11 @@ async function saveComment() {
         adminBadge: commentAdminBadge.value,
         avatarPrefix: avatarPrefix.value,
         adminEnabled: commentAdminEnabled.value,
-        allowedDomains: allowedDomains.value
-          .split(/[,，\n]/)
-          .map((d) => d.trim())
-          .filter(Boolean),
+        allowedDomains: allowedDomainTags.value,
         adminKey: commentAdminKey.value || undefined,
         requireReview: requireReview.value,
-        blockedIps: blockedIps.value
-          .split(/[,，\n]/)
-          .map((d) => d.trim())
-          .filter(Boolean),
-        blockedEmails: blockedEmails.value
-          .split(/[,，\n]/)
-          .map((d) => d.trim())
-          .filter(Boolean),
+        blockedIps: blockedIpTags.value,
+        blockedEmails: blockedEmailTags.value,
       }),
     ]);
 

@@ -83,35 +83,40 @@
             :class="{ active: isRouteActive('comments') }"
             @click="goComments"
           >
-            评论管理
+            <PhChatCircleDots class="menu-item-icon" :size="18" />
+            <span>评论管理</span>
           </li>
           <li
             class="menu-item"
             :class="{ active: isRouteActive('stats') }"
             @click="goStats"
           >
-            数据看板
+            <PhSquaresFour class="menu-item-icon" :size="18" />
+            <span>数据看板</span>
           </li>
           <li
             class="menu-item"
             :class="{ active: isRouteActive('analytics') }"
             @click="goAnalytics"
           >
-            访问统计
+            <PhChartBar class="menu-item-icon" :size="18" />
+            <span>访问统计</span>
           </li>
           <li
             class="menu-item"
             :class="{ active: isRouteActive('settings') }"
             @click="goSettings"
           >
-            网站设置
+            <PhGear class="menu-item-icon" :size="18" />
+            <span>网站设置</span>
           </li>
           <li
             class="menu-item"
             :class="{ active: isRouteActive('data') }"
             @click="goData"
           >
-            数据管理
+            <PhDatabase class="menu-item-icon" :size="18" />
+            <span>数据管理</span>
           </li>
         </ul>
         <div class="layout-sider-footer" @click="openVersionModal">
