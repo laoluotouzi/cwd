@@ -9,7 +9,7 @@
 		"cf-typegen": "wrangler types"
 	},
 	"devDependencies": {
-		"@cloudflare/vitest-pool-workers": "^0.8.19",
+		"@cloudflare/vitest-pool-workers": "^0.12.9",
 		"@types/nodemailer": "^7.0.5",
 		"@types/ua-parser-js": "^0.7.39",
 		"typescript": "^5.5.2",
